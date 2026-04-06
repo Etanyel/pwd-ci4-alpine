@@ -34,21 +34,21 @@ class AuthController extends BaseController
         if ($user && password_verify($password, $user['password'])) {
             if ($user['isActive'] == 1) {
                 $session = session();
-                $userData = [
+
+                $session->set([
                     'userRole' => $user['role'],
                     'userId' => $user['id'],
                     'user_firstname' => $user['firstname'],
                     'user_lastname' => $user['lastname'],
                     'user_img' => $user['img'],
                     'isLoggedIn' => true,
-                ];
-                $session->set($userData);
+                ]);
 
                 $session->regenerate();
 
                 return $this->response->setJSON([
                     'status' => 'success',
-                    'userData' => $userData
+                    'role' => $user['role'],
                 ]);
             } else {
                 return $this->response->setJSON([

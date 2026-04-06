@@ -27,17 +27,14 @@ class RoleFilter implements FilterInterface
     {
         $role = session()->get('userRole');
 
-        // ❌ Not logged in
         if (!$role) {
-            return redirect()->to('/login');
+            return redirect()->to('/');
         }
 
-        // ❌ No roles defined in route
         if (empty($arguments)) {
             return;
         }
 
-        // ❌ Role not allowed
         if (!in_array($role, $arguments)) {
             return redirect()->to('/unauthorized');
         }

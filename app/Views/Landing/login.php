@@ -110,8 +110,18 @@
                     if (data.status !== 'success') {
                         this.errors = data.errors;
                     } else {
-                        localStorage.setItem('userData', data.userData);
 
+                        localStorage.setItem('role', data.role);
+                        const role = data.role;
+                        if (role == 'admin') {
+                            window.location.href = '/admin/pdao';
+                        } else {
+                            if (role == 'user') {
+                                window.location.href = '/pdao';
+                            } else {
+                                return false;
+                            }
+                        }
                     }
 
 
