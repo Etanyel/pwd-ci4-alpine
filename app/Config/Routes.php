@@ -26,6 +26,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/admin/add-record', 'AddRecordPageController::index');
         $routes->get('/admin/fetch-cause/(:num)', 'AddRecordPageController::fetchCause/$1'); //fetch cause based on id
         $routes->get('/admin/fetch-disability', 'AddRecordPageController::fetchDisability'); //fetch Disability
+        $routes->get('/fetch-regions', 'LocationController::fetchRegions');
+        $routes->get('/fetch-province/(:any)', 'LocationController::fetchProvinces/$1');
+        $routes->get('/fetch-cities/(:any)', 'LocationController::fetchCities/$1');
+        $routes->get('/fetch-barangays/(:any)', 'LocationController::fetchBarangays/$1');
 
 
         // Manage User Page Index

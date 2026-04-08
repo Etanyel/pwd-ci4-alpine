@@ -222,10 +222,10 @@
 
 
             async fetchRegions() {
-                const res = await fetch('https://psgc.gitlab.io/api/regions/');
+                const res = await fetch('<?= base_url('/fetch-regions') ?>');
                 const regions = await res.json();
-                this.regions = regions;
-                // console.log(regions);
+                this.regions = regions.regions;
+                console.log(regions);
             },
 
             async fetchProvinces() {
@@ -233,21 +233,30 @@
                 this.cities = [];
                 this.barangays = [];
 
-                const res = await fetch(`https://psgc.gitlab.io/api/regions/${this.form.region}/provinces/`);
-                this.provinces = await res.json();
+                const res = await fetch(`/fetch-province/${this.form.region}`);
+                const data = await res.json();
+
+                console.log(data.provinces);
+                this.provinces = data.provinces;
             },
 
             async fetchCities() {
                 this.cities = [];
                 this.barangays = [];
 
-                const res = await fetch(`https://psgc.gitlab.io/api/provinces/${this.form.province}/cities-municipalities/`);
-                this.cities = await res.json();
+                const res = await fetch(`/fetch-cities/${this.form.province}`);
+                const data = await res.json();
+
+                console.log(data.cities);
+                this.cities = data.cities;
             },
 
             async fetchBarangays() {
-                const res = await fetch(`https://psgc.gitlab.io/api/cities-municipalities/${this.form.city}/barangays/`);
-                this.barangays = await res.json();
+                const res = await fetch(`/fetch-barangays/${this.form.city}`);
+                const data = await res.json();
+
+                console.log(data.barangays);
+                this.barangays = data.barangays;
             },
 
             formatDate(date) {
