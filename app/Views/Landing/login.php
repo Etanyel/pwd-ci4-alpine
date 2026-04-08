@@ -43,7 +43,7 @@
                             x-bind:class="errors.username ? 'border-1 border-danger' : ''"
                             class="form-control bg-light border-start-0 ps-0"
                             x-model="form.username"
-                            placeholder="Enter your username">
+                            placeholder="Enter your username" required>
                     </div>
                     <div x-show="errors.username" class="text-danger mt-1 fw-medium" style="font-size: 12px;">
                         <i class="bi bi-exclamation-circle me-1"></i> <span x-text="errors.username"></span>
@@ -60,7 +60,7 @@
                             class="form-control bg-light border-start-0 border-end-0 ps-0"
                             x-bind:class="errors.password ? 'border-1 border-danger' : ''"
                             x-model="form.password"
-                            placeholder="••••••••">
+                            placeholder="••••••••" required>
                         <button type="button"
                             class="input-group-text bg-light border-start-0"
                             x-bind:class="errors.password ? 'border-1 border-danger' : ''"
@@ -74,7 +74,7 @@
                 </div>
 
                 <div class="d-grid">
-                    <button class="btn btn-primary btn-lg shadow-sm py-2 fw-bold" type="submit">
+                    <button class="btn btn-primary btn-lg shadow-sm py-2 fw-bold" type="submit" :disabled="loading">
                         <i class="bi bi-box-arrow-in-right me-2"></i> Login
                     </button>
                 </div>
@@ -89,6 +89,7 @@
             Alpine.data('loginApp', () => ({
                 errors: {},
                 showPassword: false,
+                loading: false,
 
                 form: {
                     username: '',
@@ -96,35 +97,38 @@
                 },
 
                 async login() {
-                    const formData = new FormData();
-                    formData.append('username', this.form.username);
-                    formData.append('password', this.form.password);
+                    try {
+                        this.loading = true;
 
-                    const res = await fetch('/login', {
-                        method: 'POST',
-                        body: formData
-                    });
+                        const formData = new FormData();
+                        formData.append('username', this.form.username.trim());
+                        formData.append('password', this.form.password);
 
-                    const data = await res.json();
+                        const res = await fetch('/login', {
+                            method: 'POST',
+                            body: formData
+                        });
 
-                    if (data.status !== 'success') {
-                        this.errors = data.errors;
-                    } else {
+                        const data = await res.json();
 
-                        localStorage.setItem('role', data.role);
-                        const role = data.role;
-                        if (role == 'admin') {
-                            window.location.href = '/admin/pdao';
+                        if (data.status !== 'success') {
+                            this.errors = data.errors || {};
+                            this.loading = false;
                         } else {
-                            if (role == 'user') {
+
+                            if (data.role === 'admin') {
+                                window.location.href = '/admin/pdao';
+                                this.loading = false;
+
+                            } else if (data.role === 'user') {
                                 window.location.href = '/pdao';
-                            } else {
-                                return false;
+                                this.loading = false;
                             }
                         }
+                    } catch (err) {
+                        console.error(err);
+                        Swal.fire('Warning', 'Something went wrong. Please try again.', 'warning');
                     }
-
-
                 },
 
                 resetForm() {

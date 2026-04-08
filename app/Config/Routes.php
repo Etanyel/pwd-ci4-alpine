@@ -5,17 +5,62 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
 
-$routes->post('/login', 'AuthController::login');
+// Guest
+$routes->group('', ['filter' => 'guest'], function ($routes) {
+    $routes->get('/', 'Home::index');
 
-$routes->post('/register-user', 'UserController::registerUser');
+    $routes->post('/login', 'AuthController::login');
+});
 
-$routes->get('/logout', 'AuthController::logout');
+
+// With Auth
+$routes->group('', ['filter' => 'auth'], function ($routes) {
+
+    // Admin 
+    $routes->group('', ['filter' => 'role:admin'], function ($routes) {
+        $routes->get('/admin/pdao', 'AdminPageController::index');
+        $routes->get('/admin/manage-users', 'AdminPageController::manageUserPage');
+
+
+        $routes->get('/admin/add-record', 'AddRecordPageController::index');
+        $routes->get('/admin/fetch-cause/(:num)', 'AddRecordPageController::fetchCause/$1'); //fetch cause based on id
+        $routes->get('/admin/fetch-disability', 'AddRecordPageController::fetchDisability'); //fetch Disability
+
+
+        // Manage User Page Index
+        $routes->post('/register-user', 'UserController::registerUser');
+        // Manage User Page
+        $routes->get('/admin/fetch-users', 'UserPageController::fetchUsers'); //Fetch all users
+        $routes->get('/admin/fetch-users/(:num)', 'ShowUserPageController::fetchUser/$1'); //Fetch User
+        $routes->get('/admin/fetch-user-profile/(:num)', 'ShowUserPageController::fetchUserProfile/$1'); //Fetch user for ajax
+        $routes->post('/admin/user-change-pass', 'ShowUserPageController::changePass'); //Change User Password
+        $routes->post('/admin/upload-user-photo', 'ShowUserPageController::uploadPhoto'); //update user profile photo
+        $routes->post('/admin/user-update-info/', 'ShowUserPageController::updateInfo'); //update user personal info
+    });
+
+    // User
+    $routes->group('', ['filter' => 'role:user'], function ($routes) {
+        $routes->get('/pdao', 'UserPageController::index');
+
+        $routes->post('/pdao', 'UserController::registerUser');
+    });
+
+    $routes->get('/logout', 'AuthController::logout');
+});
 
 
 
 // Error pages
 $routes->get('/unauthorized', function () {
     return view('errors/html/unauthorized');
+});
+
+$routes->get('/forbidden', function () {
+    return view('errors/html/forbidden');
+});
+
+
+$routes->get('/save', function () {
+    return view('save');
 });
