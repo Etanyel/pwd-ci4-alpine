@@ -30,6 +30,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/fetch-province/(:any)', 'LocationController::fetchProvinces/$1');
         $routes->get('/fetch-cities/(:any)', 'LocationController::fetchCities/$1');
         $routes->get('/fetch-barangays/(:any)', 'LocationController::fetchBarangays/$1');
+        $routes->get('/fetch-occupation', 'AddRecordPageController::fetchOccupation'); // Occupations
 
 
         // Manage User Page Index

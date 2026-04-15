@@ -54,4 +54,24 @@ class AddRecordPageController extends BaseController
             ]);
         }
     }
+
+    public function fetchOccupation()
+    {
+        try {
+            $model = db_connect()->table('person_occupation');
+            $occupation = $model->get()->getResultArray();
+
+            return $this->response->setStatusCode(200)->setJSON([
+                'status' => 'success',
+                'data' => $occupation
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', $e->getMessage());
+
+            return $this->response->setStatusCode(500)->setJSON([
+                'status' => 'error',
+                'message' => 'Failed to fetch occupation.'
+            ]);
+        }
+    }
 }
