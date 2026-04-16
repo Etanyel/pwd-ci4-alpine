@@ -17,12 +17,12 @@
                     <div class="col-6">
                         <label class="form-label fw-semibold">1. PWD NUMBER <span :class="form.pwd_no.length == 0 ? 'text-danger' : 'd-none'">*</span></label>
                         <input type="text" x-model="form.pwd_no" class="form-control" placeholder="(RR-PPMM-BB-NNNNNNNN)" required>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.pwd_no"></p>
                     </div>
                     <div class="col-6">
                         <label class="form-label fw-semibold">2. DATE APPLIED <span :class="form.date_applied.length == 0 ? 'text-danger' : 'd-none'">*</span></label>
                         <input type="date" class="form-control" x-model="form.date_applied" required>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.date_applied"></p>
                     </div>
                 </div>
             </div>
@@ -33,22 +33,22 @@
                     <div class="col-4">
                         <label class="form-label fw-semibold">3. LAST NAME <span :class="form.lastname.length == 0 ? 'text-danger' : 'd-none'">*</span></label>
                         <input type="text" class="form-control" x-model="form.lastname" placeholder="eg. DELA CRUZ" required>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.lastname"></p>
                     </div>
                     <div class="col-4">
                         <label class="form-label fw-semibold">FIRST NAME <span :class="form.firstname.length == 0 ? 'text-danger' : 'd-none'">*</span></label>
                         <input type="text" class="form-control" x-model="form.firstname" placeholder="eg. JUAN" required>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.firstname"></p>
                     </div>
                     <div class="col-2">
                         <label class="form-label fw-semibold">MIDDLE NAME <span class="text-muted" style="font-size: 13px;">(optional)</span></label>
                         <input type="text" class="form-control" x-model="form.middlename" placeholder="eg. D." maxlength="1">
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.middlename"></p>
                     </div>
                     <div class="col-2">
                         <label class="form-label fw-semibold">SUFFIX <span class="text-muted" style="font-size: 13px;">(optional)</span></label>
                         <input type="text" class="form-control" x-model="form.suffix" placeholder="eg. JR., SR., III" maxlength="1">
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.suffix"></p>
                     </div>
                 </div>
             </div>
@@ -56,52 +56,50 @@
             <!-- TYPE OF DISABILITY/CAUSE OF DISABILITY -->
             <div class="mb-3">
                 <div class="row">
-                    <div class="col-6">
-                        <label class="form-label fw-semibold">4. TYPE OF DISABILITY</label>
+                    <div class="col-4">
+                        <label class="form-label fw-semibold">4. TYPE OF DISABILITY <span :class="form.typeDisability == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <select class="form-select" x-model="form.typeDisability">
                             <template x-for="item in disability" :key="item.id">
                                 <option :value="item.id"><span x-text="item.disability"></span></option>
                             </template>
                         </select>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.type_of_disability"></p>
                     </div>
-                    <div class="col-6">
-                        <label class="form-label fw-semibold">5. CAUSE OF DISABILITY</label>
-                        <div class="row">
-                            <div class="col-6">
-                                <select class="form-select"
-                                    x-model="form.causeOfDisability"
-                                    @change="causeOf()" required>
-                                    <option value="">Select Type</option>
-                                    <option value="2">Congenital/Inborn</option>
-                                    <option value="1">Acquired</option>
-                                </select>
-                            </div>
+                    <div class="col-4">
+                        <label class="form-label fw-semibold">5. CAUSE OF DISABILITY <span :class="form.causeOfDisability == '' ? 'text-danger' : 'd-none'">*</span></label>
 
-                            <template x-if="cause_title.length">
-                                <div class="col-6">
-                                    <select class="form-select" x-model="form.cause" required>
-                                        <option value="">Select cause</option>
-                                        <template x-for="title in cause_title" :key="title.id">
-                                            <option :value="title.cause_id" x-text="title.title"></option>
-                                        </template>
-                                    </select>
-                                </div>
+                        <select class="form-select"
+                            x-model="form.causeOfDisability"
+                            @change="causeOf()" required>
+                            <option value="">Select Type</option>
+                            <option value="2">Congenital/Inborn</option>
+                            <option value="1">Acquired</option>
+                        </select>
+                        <p class="text-danger fw-semibold" x-text="errors.cause_of_disability"></p>
+                    </div>
 
-                                <p x-text="form.cause"></p>
-                            </template>
-
-                            <template x-if="form.cause == 8">
-                                <div class="mt-2">
-                                    <label class="form-label">Others</label>
-                                    <input type="text" x-model="form.other_cause" class="form-control" placeholder="Other cause of disability" required>
-                                </div>
-                            </template>
+                    <template x-if="cause_title.length > 0">
+                        <div :class="form.cause == 8 ? 'col-2' : 'col-4'">
+                            <label for="" class="form-label fw-semibold">CAUSE <span :class="form.cause == '' ? 'text-danger' : 'd-none'">*</span></label>
+                            <select class="form-select" x-model="form.cause" required>
+                                <option value="">Select cause</option>
+                                <template x-for="title in cause_title" :key="title.id">
+                                    <option :value="title.cause_id"><span x-text="title.title"></span></option>
+                                </template>
+                            </select>
                         </div>
-                        <p x-text=""></p>
-                    </div>
+                    </template>
+
+                    <template x-if="form.cause == 8">
+                        <div class="col-2">
+                            <label class="form-label fw-semibold">Other Cause</label>
+                            <input type="text" x-model="form.other_cause" class="form-control" placeholder="Other cause of disability" required>
+                            <p class="text-danger fw-semibold" x-text="errors.other_cause"></p>
+                        </div>
+                    </template>
                 </div>
             </div>
+            <hr>
 
             <!-- ADDRESS -->
             <div class="mb-4">
@@ -109,43 +107,43 @@
                 <div class="row">
                     <!-- REGION -->
                     <div class="col-3">
-                        <label class="form-label fw-semibold">REGION</label>
+                        <label class="form-label fw-semibold">REGION <span :class="form.region == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <select class="form-select" x-model="form.region" @change="fetchProvinces">
                             <option value="">Select Region</option>
                             <template x-for="r in regions" :key="r.code">
-                                <option :value="r.code" x-text="r.name"></option>
+                                <option :value="r.code" x-text="r.region_name"></option>
                             </template>
                         </select>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.region"></p>
                     </div>
 
                     <!-- PROVINCE -->
                     <div class="col-3">
-                        <label for="" class="form-label fw-semibold">PROVINCE</label>
+                        <label for="" class="form-label fw-semibold">PROVINCE <span :class="form.province == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <select class="form-select" x-model="form.province" @change="fetchCities" :disabled="form.region == ''">
                             <option value="">Select Province</option>
                             <template x-for="p in provinces" :key="p.code">
                                 <option :value="p.code" x-text="p.name"></option>
                             </template>
                         </select>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.province"></p>
                     </div>
 
                     <!-- CITY -->
-                    <div class="col-3">
-                        <label for="" class="form-label fw-semibold">CITY/MUNICIPALITY</label>
+                    <div class="col-2">
+                        <label for="" class="form-label fw-semibold">CITY/MUNICIPALITY <span :class="form.city == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <select class="form-select" x-model="form.city" @change="fetchBarangays" :disabled="form.province == ''">
                             <option value="">Select City</option>
                             <template x-for="c in cities" :key="c.code">
                                 <option :value="c.code" x-text="c.name"></option>
                             </template>
                         </select>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.city_municipality"></p>
                     </div>
 
                     <!-- BARANGAY -->
-                    <div class="col-3">
-                        <label for="" class="form-label fw-semibold">BARANGAY</label>
+                    <div class="col-2">
+                        <label for="" class="form-label fw-semibold">BARANGAY <span :class="form.barangay == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <template x-if="barangays.length !== 0">
                             <select class="form-select" x-model="form.barangay" required>
                                 <option value="">Select Barangay</option>
@@ -153,16 +151,24 @@
                                     <option :value="b.code" x-text="b.name"></option>
                                 </template>
                             </select>
-                            <p x-text=""></p>
+                            <p class="text-danger fw-semibold" x-text="errors.barangay"></p>
                         </template>
 
                         <template x-if="barangays.length == 0">
                             <input type="text" class="form-control" :disabled="form.city == ''" placeholder="Enter barangay" x-model="form.barangay" required>
-                            <p x-text=""></p>
+                            <p class="text-danger fw-semibold" x-text="errors.barangay"></p>
                         </template>
+                    </div>
+
+                    <!-- Street Name -->
+                    <div class="col-2">
+                        <label for="" class="form-label fw-semibold">STREET NAME/PUROK <span :class="form.street_name == '' ? 'text-danger' : 'd-none'">*</span></label>
+                        <input type="text" class="form-control" x-model="form.street_name" placeholder="Enter Purok" :disabled="form.barangay == ''">
+                        <p class="text-danger fw-semibold" x-text="errors.street_name"></p>
                     </div>
                 </div>
             </div>
+            <hr>
 
             <!-- Contact Details -->
             <div class="mb-3">
@@ -180,42 +186,43 @@
                         <input type="text" class="form-control" x-model="form.mobile_no" placeholder="09123456789">
                     </div>
 
-                    <!-- CITY -->
+                    <!-- Email Address -->
                     <div class="col-4">
                         <label for="" class="form-label fw-semibold">EMAIL ADDRESS</label>
                         <input type="email" class="form-control" x-model="form.email" placeholder="josemariechan@example.com">
                     </div>
                 </div>
             </div>
+            <hr>
 
             <!-- BIRTHDATE -->
             <div class="mb-3">
                 <div class="row">
                     <div class="col-4">
-                        <label for="" class="form-label fw-semibold">8. DATE OF BIRTH</label>
+                        <label for="" class="form-label fw-semibold">8. DATE OF BIRTH <span :class="form.birthdate == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <input type="date" x-model="form.birthdate" class="form-control">
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.birthdate"></p>
                     </div>
 
                     <div class="col-4">
-                        <label for="" class="form-label fw-semibold">9. SEX</label>
+                        <label for="" class="form-label fw-semibold">9. SEX <span :class="form.sex == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <select class="form-select" x-model="form.sex">
-                            <option value="MALE">MALE</option>
-                            <option value="FEMALE">FEMALE</option>
+                            <option value="male">MALE</option>
+                            <option value="female">FEMALE</option>
                         </select>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.sex"></p>
                     </div>
 
                     <div class="col-4">
-                        <label for="" class="form-label fw-semibold">10. CIVIL STATUS</label>
+                        <label for="" class="form-label fw-semibold">10. CIVIL STATUS <span :class="form.civil_status == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <select class="form-select" x-model="form.civil_status">
-                            <option value="0"></option>
-                            <option value="1"></option>
-                            <option value="2"></option>
-                            <option value="3"></option>
-                            <option value="4"></option>
+                            <option value="0">Single</option>
+                            <option value="1">Married</option>
+                            <option value="2">Separated</option>
+                            <option value="3">Widow/er</option>
+                            <option value="4">Cohabitation (Live-in)</option>
                         </select>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.civil_status"></p>
                     </div>
                 </div>
             </div>
@@ -223,7 +230,7 @@
             <div class="mb-3">
                 <div class="row">
                     <div class="col-2">
-                        <label class="form-label fw-semibold">11. EDUCATIONAL ATTAINMENT</label>
+                        <label class="form-label fw-semibold">11. EDUCATIONAL ATTAINMENT <span :class="form.educational_attainment == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <select class="form-select" x-model="form.educational_attainment">
                             <option value="0">None</option>
                             <option value="1">Kindergarten</option>
@@ -234,16 +241,16 @@
                             <option value="6">Vocational</option>
                             <option value="7">Post Graduate</option>
                         </select>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.educational_attainment"></p>
                     </div>
                     <div class="col-2">
-                        <label class="form-label fw-semibold">12. EMPLOYMENT STATUS</label>
+                        <label class="form-label fw-semibold">12. EMPLOYMENT STATUS <span :class="form.employment_status == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <select class="form-select" x-model="form.employment_status">
                             <option value="0">Employed</option>
                             <option value="1">Unemployed</option>
                             <option value="2">Self-Employed</option>
                         </select>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.employment_status"></p>
                     </div>
 
                     <div class="col-2">
@@ -252,34 +259,37 @@
                             <option value="0">Government</option>
                             <option value="1">Private</option>
                         </select>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.category_of_employment"></p>
                     </div>
 
                     <div class="col-2">
-                        <label class="form-label fw-semibold">12.2 NATURE OF EMPLOYMENT</label>
+                        <label class="form-label fw-semibold">12.2 NATURE OF EMPLOYMENT <span :class="form.nature_of_employment == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <select class="form-select" x-model="form.nature_of_employment">
                             <option value="">Select nature of employment</option>
                             <option value="0">Casual</option>
                             <option value="1">Seasonal</option>
                             <option value="2">Emergency</option>
                         </select>
-                        <p x-text=""></p>
+                        <p class="text-danger fw-semibold" x-text="errors.nature_of_employment"></p>
                     </div>
 
-                    <div class="col-4">
-                        <label class="form-label fw-semibold">13. OCCUPATION</label>
+                    <div :class="form.occupation == 11 ? 'col-2' : 'col-4'">
+                        <label class="form-label fw-semibold">13. OCCUPATION <span :class="form.occupation == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <select class="form-select" x-model="form.occupation">
                             <template x-for="item in occupation" :key="item.id">
                                 <option :value="item.occupation_id"><span x-text="item.occupation_name"></span></option>
                             </template>
                         </select>
-                        <p x-text=""></p>
-
-                        <template x-if="form.occupation === 11">
-                            <label class="form-label">Other Occupation</label>
-                            <input type="text" placeholder="Other Occupation" class="form-control">
-                        </template>
+                        <p class="text-danger fw-semibold" x-text="errors.occupation"></p>
                     </div>
+
+                    <template x-if="form.occupation == 11">
+                        <div class="col-2">
+                            <label class="form-label fw-semibold">Other Occupation <span :class="form.other_occupation == '' ? 'text-danger' : 'd-none'">*</span></label>
+                            <input type="text" placeholder="Enter other occupation" class="form-control" required>
+                            <p class="text-danger fw-semibold" x-text="errors.other_occupation"></p>
+                        </div>
+                    </template>
 
                 </div>
             </div>
@@ -337,6 +347,7 @@
                     </div>
                 </div>
             </div>
+            <hr>
 
             <div class="mb-2">
                 <label for="" class="form-label fw-semibold">17. FAMILY BACKGROUND</label>
@@ -421,6 +432,7 @@
                 province: '',
                 city: '',
                 barangay: '',
+                street_name: '',
                 landline: '',
                 mobile_no: '',
                 email: '',
@@ -455,7 +467,7 @@
                 this.fetchRegions();
             },
 
-            addRecord() {
+            async addRecord() {
                 const formData = new FormData();
                 formData.append('pwd_no', this.form.pwd_no);
                 formData.append('date_applied', this.form.date_applied);
@@ -466,6 +478,52 @@
                 formData.append('type_of_disability', this.form.typeDisability);
                 formData.append('cause_of_disability', this.form.causeOfDisability);
                 formData.append('cause', this.form.cause);
+                formData.append('other_cause', this.form.other_cause);
+                formData.append('region', this.form.region);
+                formData.append('province', this.form.province);
+                formData.append('city', this.form.city);
+                formData.append('barangay', this.form.barangay);
+                formData.append('street_name', this.form.street_name);
+                formData.append('landline', this.form.landline);
+                formData.append('mobile_no', this.form.mobile_no);
+                formData.append('email', this.form.email);
+                formData.append('birthdate', this.form.birthdate);
+                formData.append('sex', this.form.sex);
+                formData.append('civil_status', this.form.civil_status);
+                formData.append('educational_attainment', this.form.educational_attainment);
+                formData.append('employment_status', this.form.employment_status);
+                formData.append('category_of_employment', this.form.category_of_employment);
+                formData.append('nature_of_employment', this.form.nature_of_employment);
+                formData.append('occupation', this.form.occupation);
+                formData.append('other_occupation', this.form.other_occupation);
+                formData.append('bloodtype', this.form.bloodtype);
+                formData.append('organization_affliated', this.form.organization_affliated);
+                formData.append('office_address', this.form.office_address);
+                formData.append('contact_person', this.form.contact_person);
+                formData.append('sss_no', this.form.sss_no);
+                formData.append('gsis_no', this.form.gsis_no);
+                formData.append('psn_no', this.form.psn_no);
+                formData.append('philhealth_no', this.form.philhealth_no);
+                formData.append('fathers_lastname', this.form.fathers_lastname);
+                formData.append('fathers_firstname', this.form.fathers_firstname);
+                formData.append('fathers_middlename', this.form.fathers_middlename);
+                formData.append('mothers_lastname', this.form.mothers_lastname);
+                formData.append('mothers_firstname', this.form.mothers_firstname);
+                formData.append('mothers_middlename', this.form.mothers_middlename);
+
+                const res = await fetch('/admin/add-record', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (data.status === 'error') {
+                    this.errors = data.errors;
+                    return;
+                }
+                Swal.fire('Added Success', data.message, 'success');
+
 
                 console.log(
                     // this.form.pwd_no,
@@ -476,38 +534,38 @@
                     // this.form.suffix,
                     // this.form.typeDisability,
                     // this.form.causeOfDisability,
-                    this.form.cause,
-                    this.form.other_cause,
-                    this.form.region,
-                    this.form.province,
-                    this.form.city,
-                    this.form.barangay,
-                    this.form.landline,
-                    this.form.mobile_no,
-                    this.form.email,
-                    this.form.birthdate,
-                    this.form.sex,
-                    this.form.civil_status,
-                    this.form.educational_attainment,
-                    this.form.employment_status,
-                    this.form.category_of_employment,
-                    this.form.nature_of_employment,
-                    this.form.occupation,
-                    this.form.other_occupation,
-                    this.form.bloodtype,
-                    this.form.organization_affliated,
-                    this.form.office_address,
-                    this.form.contact_person,
-                    this.form.sss_no,
-                    this.form.gsis_no,
-                    this.form.psn_no,
-                    this.form.philhealth_no,
-                    this.form.fathers_lastname,
-                    this.form.fathers_firstname,
-                    this.form.fathers_middlename,
-                    this.form.mothers_lastname,
-                    this.form.mothers_firstname,
-                    this.form.mothers_middlename,
+                    // this.form.cause,
+                    // this.form.other_cause,
+                    // this.form.region,
+                    // this.form.province,
+                    // this.form.city,
+                    // this.form.barangay,
+                    // this.form.landline,
+                    // this.form.mobile_no,
+                    // this.form.email,
+                    // this.form.birthdate,
+                    // this.form.sex,
+                    // this.form.civil_status,
+                    // this.form.educational_attainment,
+                    // this.form.employment_status,
+                    // this.form.category_of_employment,
+                    // this.form.nature_of_employment,
+                    // this.form.occupation,
+                    // this.form.other_occupation,
+                    // this.form.bloodtype,
+                    // this.form.organization_affliated,
+                    // this.form.office_address,
+                    // this.form.contact_person,
+                    // this.form.sss_no,
+                    // this.form.gsis_no,
+                    // this.form.psn_no,
+                    // this.form.philhealth_no,
+                    // this.form.fathers_lastname,
+                    // this.form.fathers_firstname,
+                    // this.form.fathers_middlename,
+                    // this.form.mothers_lastname,
+                    // this.form.mothers_firstname,
+                    // this.form.mothers_middlename,
                 );
             },
 
@@ -598,6 +656,50 @@
                 this.barangays = data.barangays;
 
                 // console.log('BARANGAY: ' + this.barangays);
+            },
+
+            resetForm() {
+                this.pwd_no = '';
+                this.date_applied = '';
+                this.lastname = '';
+                this.firstname = '';
+                this.middlename = '';
+                this.suffix = '';
+                this.typeDisability = '';
+                this.causeOfDisability = '';
+                this.cause = '';
+                this.region = '';
+                this.province = '';
+                this.city = '';
+                this.barangay = '';
+                this.landline = '';
+                this.mobile_no = '';
+                this.email = '';
+                this.birthdate = '';
+                this.sex = '';
+                this.civil_status = '';
+                this.educational_attainment = '';
+                this.employment_status = '';
+                this.category_of_employment = '';
+                this.nature_of_employment = '';
+                this.occupation = '';
+                this.other_occupation = '';
+                this.bloodtype = '';
+                this.organization_affliated = '';
+                this.office_address = '';
+                this.contact_person = '';
+                this.sss_no = '';
+                this.gsis_no = '';
+                this.psn_no = '';
+                this.philhealth_no = '';
+                this.fathers_lastname = '';
+                this.fathers_firstname = '';
+                this.fathers_middlename = '';
+                this.mothers_lastname = '';
+                this.mothers_firstname = '';
+                this.mothers_middlename = '';
+
+                this.errors = {};
             },
 
             formatDate(date) {
