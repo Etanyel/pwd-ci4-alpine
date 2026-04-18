@@ -10,7 +10,7 @@ class ManageRecordPageController extends BaseController
 {
     public function index()
     {
-        return view('admin/manage-record');
+        return view('admin/manage-records');
     }
 
     public function fetchRecords()
@@ -30,4 +30,43 @@ class ManageRecordPageController extends BaseController
             ]);
         }
     }
+
+
+    public function manageRecord($id)
+    {
+        $model = new PersonsModel();
+        $record = $model->find($id);
+        if (!$record) {
+            return redirect()->back()->with('error', 'Record not found');
+        }
+
+        return view('admin/manage-record', ['record' => $record]);    
+    }
+
+    public function fetchRecord($id)
+    {
+        try {
+            $model = new PersonsModel();
+            $record = $model->find($id);
+
+        if (!$record) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => 'Record not found'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data' => $record
+        ]);
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $e->getMessage()
+            ]);
+        }
+    }
+
+    
 }

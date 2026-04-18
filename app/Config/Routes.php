@@ -36,6 +36,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/admin/manage-records', 'ManageRecordPageController::index');
         $routes->get('/admin/fetch-records', 'ManageRecordPageController::fetchRecords'); //Fetch all records
         $routes->get('/admin/fetch-records/(:num)', 'ManageRecordPageController::fetchRecord/$1'); //Fetch record based on id
+        $routes->get('/admin/manage-record/(:num)', 'ManageRecordPageController::manageRecord/$1'); //Fetch record based on id
 
         // Manage User Page Index
         $routes->post('/register-user', 'UserController::registerUser');
