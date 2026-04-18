@@ -11,6 +11,7 @@ use App\Models\PersonsModel;
 use App\Models\ProvinceModel;
 use App\Models\RegionModel;
 use CodeIgniter\HTTP\ResponseInterface;
+use Config\Services;
 
 class AddRecordPageController extends BaseController
 {
@@ -98,17 +99,24 @@ class AddRecordPageController extends BaseController
 
             $region_find = $regionModel->where('code', $region)->first();
             $province_find = $provinceModel->where('code', $province)->first();
-            $city_find = $provinceModel->where('code', $city)->first();
-            $barangay_find = $provinceModel->where('code', $barangay)->first();
+            $city_find = $cityModel->where('code', $city)->first();
+            $barangay_find = $barangayModel->where('code', $barangay)->first();
+
+            if (!$region_find || !$province_find || !$city_find || !$barangay_find) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'errors' => 'Invalid region, province, city, or barangay selected.',
+                ]);
+            }
 
 
             // build data manually (controlled)
             $data = [
                 'pwd_no' => $req->getPost('pwd_no'),
-                'lastname' => $req->getPost('lastname'),
-                'firstname' => $req->getPost('firstname'),
-                'middlename' => $req->getPost('middlename'),
-                'suffix' => $req->getPost('suffix'),
+                'lastname' => strtoupper($req->getPost('lastname')),
+                'firstname' => strtoupper($req->getPost('firstname')),
+                'middlename' => strtoupper($req->getPost('middlename')),
+                'suffix' => strtoupper($req->getPost('suffix')),
                 'sex' => $req->getPost('sex'),
                 'age' => $req->getPost('age'),
 
@@ -120,7 +128,7 @@ class AddRecordPageController extends BaseController
                 'landline' => $req->getPost('landline'),
 
                 'type_of_disability' => $req->getPost('type_of_disability'),
-                'cause_of_disability' => $req->getPost('cause_of_disability'),
+                'cause_of_disability' => $req->getPost('cause'),
                 'other_cause' => $req->getPost('other_cause'),
 
                 'civil_status' => $req->getPost('civil_status'),
@@ -142,18 +150,19 @@ class AddRecordPageController extends BaseController
                 'psn_no' => $req->getPost('psn_no'),
                 'philhealth_no' => $req->getPost('philhealth_no'),
 
-                // 🔥 combine parents name (since DB only has one field)
+                // Combine the father's lastname, firstname, and middlename
                 'fathers_name' => trim(
-                    $req->getPost('fathers_firstname') . ' ' .
-                        $req->getPost('fathers_middlename') . ' ' .
-                        $req->getPost('fathers_lastname')
-                ),
+                    strtoupper($req->getPost('fathers_firstname')) . ' ' .
+                        strtoupper($req->getPost('fathers_middlename')) . ' ' .
+                        strtoupper($req->getPost('fathers_lastname'))
+                ) ?: null,
 
+                // Combine the lastname, firstname, and middlename
                 'mothers_name' => trim(
-                    $req->getPost('mothers_firstname') . ' ' .
-                        $req->getPost('mothers_middlename') . ' ' .
-                        $req->getPost('mothers_lastname')
-                ),
+                    strtoupper($req->getPost('mothers_firstname')) . ' ' .
+                        strtoupper($req->getPost('mothers_middlename')) . ' ' .
+                        strtoupper($req->getPost('mothers_lastname'))
+                ) ?: null,
 
                 'date_applied' => $req->getPost('date_applied'),
             ];
@@ -163,9 +172,165 @@ class AddRecordPageController extends BaseController
             $data['city_municipality'] = strtoupper($city_find['name']);
             $data['barangay'] = strtoupper($barangay_find['name']);
 
+            // Set defaults for optional fields
+            $data['bloodtype'] = $data['bloodtype'] ?: 'A+';
+            $data['organization_affliated'] = $data['organization_affliated'] ?: 'None';
+            $data['office_address'] = $data['office_address'] ?: 'None';
+            $data['contact_person'] = $data['contact_person'] ?: 'None';
+
+            $validation = Services::validation();
+
+            $validation->setRules([
+                'pwd_no' => [
+                    'label' => 'PWD Number',
+                    'rules' => 'required|max_length[20]|is_unique[persons.pwd_no]',
+                ],
+                'lastname' => [
+                    'label' => 'Last Name',
+                    'rules' => 'required|max_length[50]',
+                ],
+
+                'firstname' => [
+                    'label'=> 'First Name',
+                    'rules'=> 'required|max_length[50]',
+                ],
+
+                'middlename' => [
+                    'label'=> 'Middle Name',
+                    'rules'=> 'permit_empty|max_length[50]',
+                ],
+
+                'suffix' => [
+                    'label'=> 'Suffix',
+                    'rules'=> 'permit_empty|max_length[10]',
+                ],
+
+                'sex' => [
+                    'label'=> 'Sex',
+                    'rules'=> 'required|in_list[male,female]',
+                ],
+                'age' => [
+                    'label'=> 'Age',
+                    'rules'=> 'required|integer|min_length[0]|less_than[150]',
+                ],
+                'date_applied' => [
+                    'label' => 'Date Applied',
+                    'rules' => 'required|valid_date',
+                ],
+                'type_of_disability' => [
+                    'label' => 'Type of Disability',
+                    'rules' => 'required',
+                ],
+                'cause_of_disability' => [
+                    'label' => 'Cause of Disability',
+                    'rules' => 'required',
+                ],
+                'other_cause' => [
+                    'label' => 'Other Cause',
+                    'rules' => 'permit_empty|max_length[100]',
+                ],
+                'region' => [
+                    'label' => 'Region',
+                    'rules' => 'required|max_length[100]',
+                ],
+                'province' => [
+                    'label' => 'Province',
+                    'rules' => 'required|max_length[100]',
+                ],
+                'city_municipality' => [
+                    'label' => 'City/Municipality',
+                    'rules' => 'required|max_length[100]',
+                ],
+                'barangay' => [
+                    'label' => 'Barangay',
+                    'rules' => 'required|max_length[100]',
+                ],
+                'street_name' => [
+                    'label' => 'Street Name',
+                    'rules' => 'required|max_length[250]',
+                ],
+                'birthdate' => [
+                    'label' => 'Birthdate',
+                    'rules' => 'required|valid_date',
+                ],
+                'civil_status' => [
+                    'label' => 'Civil Status',
+                    'rules' => 'required|integer',
+                ],
+                'educational_attainment' => [
+                    'label' => 'Educational Attainment',
+                    'rules' => 'required|integer',
+                ],
+                'employment_status' => [
+                    'label' => 'Employment Status',
+                    'rules' => 'required|integer',
+                ],
+                'category_of_employment' => [
+                    'label' => 'Category of Employment',
+                    'rules' => 'permit_empty|integer',
+                ],
+                'nature_of_employment' => [
+                    'label' => 'Nature of Employment',
+                    'rules' => 'required|integer',
+                ],
+                'occupation' => [
+                    'label' => 'Occupation',
+                    'rules' => 'permit_empty|integer',
+                ],
+                'other_occupation' => [
+                    'label' => 'Other Occupation',
+                    'rules' => 'permit_empty|max_length[250]',
+                ],
+                'bloodtype' => [
+                    'label' => 'Blood Type',
+                    'rules' => 'permit_empty|in_list[A+,A-,B+,B-,O+,O-,AB+,AB-]',
+                ],
+                'organization_affliated' => [
+                    'label' => 'Organization Affiliated',
+                    'rules' => 'permit_empty|max_length[250]',
+                ],
+                'office_address' => [
+                    'label' => 'Office Address',
+                    'rules' => 'permit_empty|max_length[250]',
+                ],
+                'contact_person' => [
+                    'label' => 'Contact Person',
+                    'rules' => 'permit_empty|max_length[150]',
+                ],
+                'sss_no' => [
+                    'label' => 'SSS Number',
+                    'rules' => 'permit_empty|max_length[100]',
+                ],
+                'gsis_no' => [
+                    'label' => 'GSIS Number',
+                    'rules' => 'permit_empty|max_length[100]',
+                ],
+                'psn_no' => [
+                    'label' => 'PSN Number',
+                    'rules' => 'permit_empty|max_length[100]',
+                ],
+                'philhealth_no' => [
+                    'label' => 'PhilHealth Number',
+                    'rules' => 'permit_empty|max_length[100]',
+                ],
+                'fathers_name' => [
+                    'label' => 'Father\'s Name',
+                    'rules' => 'permit_empty|max_length[200]',
+                ],
+                'mothers_name' => [
+                    'label' => 'Mother\'s Name',
+                    'rules' => 'permit_empty|max_length[200]',
+                ],
+            ]);
+
+            if (!$validation->run($data)) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'errors' => $validation->getErrors(),
+                ]);
+            }
             // remove null / empty (optional but clean)
             // $data = array_filter($data, fn($v) => $v !== null && $v !== '');
-
 
             $model->insert($data);
 

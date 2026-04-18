@@ -24,6 +24,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 
         $routes->get('/admin/add-record', 'AddRecordPageController::index');
+        $routes->post('/admin/add-record', 'AddRecordPageController::addRecord');
         $routes->get('/admin/fetch-cause/(:num)', 'AddRecordPageController::fetchCause/$1'); //fetch cause based on id
         $routes->get('/admin/fetch-disability', 'AddRecordPageController::fetchDisability'); //fetch Disability
         $routes->get('/fetch-regions', 'LocationController::fetchRegions');
@@ -32,6 +33,9 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/fetch-barangays/(:any)', 'LocationController::fetchBarangays/$1');
         $routes->get('/fetch-occupation', 'AddRecordPageController::fetchOccupation'); // Occupations
 
+        $routes->get('/admin/manage-records', 'ManageRecordPageController::index');
+        $routes->get('/admin/fetch-records', 'ManageRecordPageController::fetchRecords'); //Fetch all records
+        $routes->get('/admin/fetch-records/(:num)', 'ManageRecordPageController::fetchRecord/$1'); //Fetch record based on id
 
         // Manage User Page Index
         $routes->post('/register-user', 'UserController::registerUser');

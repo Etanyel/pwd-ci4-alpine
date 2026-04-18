@@ -85,6 +85,13 @@
                         <span x-show="open"> Dashboard</span>
                     </a>
                 </li>
+                
+                <li class="nav-item rounded <?= $this->renderSection('manage-records-active') ?>">
+                    <a href="<?= base_url('/admin/manage-records'); ?>" class="nav-link text-white">
+                        <i class="bi bi-list-task"></i>
+                        <span x-show="open">Manage Records</span>
+                    </a>
+                </li>
 
                 <li class="nav-item rounded <?= $this->renderSection('add-record-active') ?>">
                     <a href="<?= base_url('/admin/add-record'); ?>" class="nav-link text-white">
