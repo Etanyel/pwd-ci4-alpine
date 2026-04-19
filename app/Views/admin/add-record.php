@@ -405,10 +405,6 @@
         </form>
     </div>
 
-
-    <!-- <div class="container-fluid card shadow-sm p-3 bg-white bg-gradient border-0 mt-4">
-
-    </div> -->
 </div>
 
 
@@ -420,7 +416,6 @@
 <script>
     function addRecordApp() {
         return {
-            search: '',
             errors: {},
             cause_title: [],
             disability: [],
