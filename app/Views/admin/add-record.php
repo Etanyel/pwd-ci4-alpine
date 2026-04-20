@@ -268,7 +268,7 @@
                     <div class="col-2">
                         <label class="form-label fw-semibold">12.1 CATEGORY OF EMPLOYMENT</label>
                         <select class="form-select" x-model="form.category_of_employment" :class="errors.category_of_employment ? 'border-danger' : ''">
-                            <option value="0">Select Category</option>
+                            <option value="">Select Category</option>
                             <option value="0">Government</option>
                             <option value="1">Private</option>
                         </select>
@@ -289,6 +289,7 @@
                     <div :class="form.occupation == 11 ? 'col-2' : 'col-4'">
                         <label class="form-label fw-semibold">13. OCCUPATION <span :class="form.occupation == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <select class="form-select" x-model="form.occupation" :class="errors.occupation ? 'border-danger' : ''">
+                            <option value="">Select Occupation</option>
                             <template x-for="item in occupation" :key="item.id">
                                 <option :value="item.occupation_id"><span x-text="item.occupation_name"></span></option>
                             </template>

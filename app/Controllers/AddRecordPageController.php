@@ -191,27 +191,27 @@ class AddRecordPageController extends BaseController
                 ],
 
                 'firstname' => [
-                    'label'=> 'First Name',
-                    'rules'=> 'required|max_length[50]',
+                    'label' => 'First Name',
+                    'rules' => 'required|max_length[50]',
                 ],
 
                 'middlename' => [
-                    'label'=> 'Middle Name',
-                    'rules'=> 'permit_empty|max_length[50]',
+                    'label' => 'Middle Name',
+                    'rules' => 'permit_empty|max_length[50]',
                 ],
 
                 'suffix' => [
-                    'label'=> 'Suffix',
-                    'rules'=> 'permit_empty|max_length[10]',
+                    'label' => 'Suffix',
+                    'rules' => 'permit_empty|max_length[10]',
                 ],
 
                 'sex' => [
-                    'label'=> 'Sex',
-                    'rules'=> 'required|in_list[male,female]',
+                    'label' => 'Sex',
+                    'rules' => 'required|in_list[male,female]',
                 ],
                 'age' => [
-                    'label'=> 'Age',
-                    'rules'=> 'required|integer|min_length[0]|less_than[150]',
+                    'label' => 'Age',
+                    'rules' => 'required|integer|min_length[0]|less_than[150]',
                 ],
                 'date_applied' => [
                     'label' => 'Date Applied',
@@ -333,6 +333,16 @@ class AddRecordPageController extends BaseController
             // $data = array_filter($data, fn($v) => $v !== null && $v !== '');
 
             $model->insert($data);
+
+            $person_new = $model->where('pwd_no', $data['pwd_no'])->first();
+            service('activitylog')->save([
+                'user_id' => session()->get('userId'),
+                'tag_id' => $person_new['id'],
+                'user_agent' => service('request')->getUserAgent()->getAgentString(),
+                'ip_address' => service('request')->getIPAddress(),
+                'action' => 'Added new record',
+                'tag' => 'MEMBER'
+            ]);
 
             return $this->response->setJSON([
                 'status' => 'success',

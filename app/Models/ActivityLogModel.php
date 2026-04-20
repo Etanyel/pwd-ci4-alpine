@@ -4,53 +4,21 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class PersonsModel extends Model
+class ActivityLogModel extends Model
 {
-    protected $table            = 'persons';
+    protected $table            = 'activity_log';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'pwd_no',
-        'lastname',
-        'firstname',
-        'middlename',
-        'suffix',
-        'sex',
-        'age',
-        'street_name',
-        'barangay',
-        'city_municipality',
-        'province',
-        'region',
-        'birthdate',
-        'mobile_no',
-        'email',
-        'landline',
-        'type_of_disability',
-        'cause_of_disability',
-        'other_cause',
-        'civil_status',
-        'employment_status',
-        'educational_attainment',
-        'category_of_employment',
-        'nature_of_employment',
-        'occupation',
-        'other_occupation',
-        'bloodtype',
-        'organization_affliated',
-        'office_address',
-        'contact_person',
-        'sss_no',
-        'gsis_no',
-        'psn_no',
-        'philhealth_no',
-        'fathers_name',
-        'mothers_name',
-        'date_applied',
-        'img'
+        'user_id',
+        'tag_id',
+        'user_agent',
+        'ip_address',
+        'action',
+        'tag'
     ];
 
     protected bool $allowEmptyInserts = false;

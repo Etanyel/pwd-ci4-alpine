@@ -37,6 +37,8 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/admin/fetch-records', 'ManageRecordPageController::fetchRecords'); //Fetch all records
         $routes->get('/admin/fetch-records/(:num)', 'ManageRecordPageController::fetchRecord/$1'); //Fetch record based on id
         $routes->get('/admin/manage-record/(:num)', 'ManageRecordPageController::manageRecord/$1'); //Fetch record based on id
+        $routes->post('/admin/update-record/(:num)', 'ManageRecordPageController::updateRecord/$1'); //update record based on id
+        $routes->post('/admin/upload-person-photo', 'ManageRecordPageController::uploadPhoto'); //update record based on id
 
         // Manage User Page Index
         $routes->post('/register-user', 'UserController::registerUser');

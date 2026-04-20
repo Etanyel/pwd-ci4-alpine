@@ -44,6 +44,15 @@ class AuthController extends BaseController
                     'isLoggedIn' => true,
                 ]);
 
+                service('activitylog')->save([
+                    'user_id' => $user['id'],
+                    'tag_id' => null,
+                    'user_agent' => service('request')->getUserAgent()->getAgentString(),
+                    'ip_address' => service('request')->getIPAddress(),
+                    'action' => 'Logged In',
+                    'tag' => 'AUTH'
+                ]);
+
                 $session->regenerate();
 
                 return $this->response->setJSON([
