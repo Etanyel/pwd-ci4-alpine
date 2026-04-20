@@ -1040,6 +1040,7 @@
                     }; // populate form with existing data
                     this.img = data.img;
                     // console.log(this.record);
+                    console.log(data.data);
 
                 } catch (error) {
                     console.error('Error fetching records:', error);

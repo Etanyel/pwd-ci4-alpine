@@ -35,7 +35,12 @@ class ManageRecordPageController extends BaseController
     public function manageRecord($id)
     {
         $model = new PersonsModel();
-        $record = $model->find($id);
+        $record = $model->select('persons.*, person_disability.disability, cause_of_disability.title, person_occupation.occupation_name')
+            ->join('person_disability', 'person_disability.disability_id = persons.type_of_disability')
+            ->join('cause_of_disability', 'cause_of_disability.disability_id = persons.cause_of_disability')
+            ->join('person_occupation', 'person_occupation.occupation_id = persons.occupation')
+            ->where('persons.id', $id)->first();
+        // $record = $model->find($id);
         if (!$record) {
             return redirect()->back()->with('error', 'Record not found');
         }

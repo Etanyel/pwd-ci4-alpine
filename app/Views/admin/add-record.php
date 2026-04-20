@@ -64,7 +64,7 @@
                         <label class="form-label fw-semibold">4. TYPE OF DISABILITY <span :class="form.typeDisability == '' ? 'text-danger' : 'd-none'">*</span></label>
                         <select class="form-select" x-model="form.typeDisability" :class="errors.type_of_disability ? 'border-danger' : ''">
                             <template x-for="item in disability" :key="item.id">
-                                <option :value="item.id"><span x-text="item.disability"></span></option>
+                                <option :value="item.disability_id"><span x-text="item.disability"></span></option>
                             </template>
                         </select>
                         <p class="text-danger fw-semibold" x-text="errors.type_of_disability"></p>
