@@ -31,6 +31,7 @@ class PersonsModel extends Model
         'landline',
         'type_of_disability',
         'cause_of_disability',
+        'cause_of',
         'other_cause',
         'civil_status',
         'employment_status',

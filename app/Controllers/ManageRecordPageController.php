@@ -37,8 +37,8 @@ class ManageRecordPageController extends BaseController
         $model = new PersonsModel();
         $record = $model->select('persons.*, person_disability.disability, cause_of_disability.title, person_occupation.occupation_name')
             ->join('person_disability', 'person_disability.disability_id = persons.type_of_disability')
-            ->join('cause_of_disability', 'cause_of_disability.disability_id = persons.cause_of_disability')
             ->join('person_occupation', 'person_occupation.occupation_id = persons.occupation')
+            ->join('cause_of_disability', 'cause_of_disability.cause_id = persons.cause_of_disability')
             ->where('persons.id', $id)->first();
         // $record = $model->find($id);
         if (!$record) {
@@ -52,7 +52,12 @@ class ManageRecordPageController extends BaseController
     {
         try {
             $model = new PersonsModel();
-            $record = $model->find($id);
+            $record = $model->select('persons.*, person_disability.disability, cause_of_disability.title, person_occupation.occupation_name')
+                ->join('person_disability', 'person_disability.disability_id = persons.type_of_disability')
+                ->join('person_occupation', 'person_occupation.occupation_id = persons.occupation')
+                ->join('cause_of_disability', 'cause_of_disability.cause_id = persons.cause_of_disability')
+                ->where('persons.id', $id)->first();
+            // $record = $model->find($id);
 
             if (!$record) {
                 return $this->response->setJSON([
@@ -244,7 +249,7 @@ class ManageRecordPageController extends BaseController
         $img->move(FCPATH . 'uploads/persons/' . $user['id'] . '/', $newName);
 
         // Save new path in database
-        $imgUrl = base_url('uploads/persons/' . $user['id'] . '/' . $newName);
+        $imgUrl = 'uploads/persons/' . $user['id'] . '/' . $newName;
         $model->update($id, ['img' => $imgUrl]);
 
         service('activitylog')->save([
@@ -261,5 +266,29 @@ class ManageRecordPageController extends BaseController
             'img_url' => $imgUrl,
             'message' => 'Profile photo updated successfully.'
         ]);
+    }
+
+
+    public function printId($id)
+    {
+        try {
+            $model = new PersonsModel();
+            $record = $model->select('persons.*, person_disability.disability, cause_of_disability.title, person_occupation.occupation_name')
+                ->join('person_disability', 'person_disability.disability_id = persons.type_of_disability')
+                ->join('person_occupation', 'person_occupation.occupation_id = persons.occupation')
+                ->join('cause_of_disability', 'cause_of_disability.cause_id = persons.cause_of_disability')
+                ->where('persons.id', $id)->first();
+            // $record = $model->find($id);
+            if (!$record) {
+                return redirect()->back()->with('error', 'Record not found');
+            }
+
+            return view('admin/id-print/id-back', ['record' => $record]);
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $e->getMessage()
+            ]);
+        }
     }
 }

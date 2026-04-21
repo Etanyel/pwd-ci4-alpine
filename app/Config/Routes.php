@@ -40,6 +40,9 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->post('/admin/update-record/(:num)', 'ManageRecordPageController::updateRecord/$1'); //update record based on id
         $routes->post('/admin/upload-person-photo', 'ManageRecordPageController::uploadPhoto'); //update record based on id
 
+        $routes->get('/admin/print-id/(:num)', 'ManageRecordPageController::printId/$1'); //print id based on id
+
+
         // Manage User Page Index
         $routes->post('/register-user', 'UserController::registerUser');
         // Manage User Page

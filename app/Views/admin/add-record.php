@@ -46,12 +46,12 @@
                     </div>
                     <div class="col-2">
                         <label class="form-label fw-semibold">MIDDLE NAME <span class="text-muted" style="font-size: 13px;">(optional)</span></label>
-                        <input type="text" class="form-control" x-model="form.middlename" :class="errors.middlename ? 'border-danger' : ''" placeholder="eg. D." maxlength="1">
+                        <input type="text" class="form-control" x-model="form.middlename" :class="errors.middlename ? 'border-danger' : ''" placeholder="eg. D." maxlength="2">
                         <p class="text-danger fw-semibold" x-text="errors.middlename"></p>
                     </div>
                     <div class="col-2">
                         <label class="form-label fw-semibold">SUFFIX <span class="text-muted" style="font-size: 13px;">(optional)</span></label>
-                        <input type="text" class="form-control" x-model="form.suffix" :class="errors.suffix ? 'border-danger' : ''" placeholder="eg. JR., SR., III" maxlength="1">
+                        <input type="text" class="form-control" x-model="form.suffix" :class="errors.suffix ? 'border-danger' : ''" placeholder="eg. JR., SR., III" maxlength="5">
                         <p class="text-danger fw-semibold" x-text="errors.suffix"></p>
                     </div>
                 </div>
@@ -484,6 +484,7 @@
                 formData.append('middlename', this.form.middlename);
                 formData.append('suffix', this.form.suffix);
                 formData.append('type_of_disability', this.form.typeDisability);
+                formData.append('cause_of', this.form.causeOfDisability);
                 formData.append('cause', this.form.cause);
                 formData.append('other_cause', this.form.other_cause);
                 formData.append('region', this.form.region);

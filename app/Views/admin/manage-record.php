@@ -15,7 +15,7 @@
             <div class="row">
                 <div class="col-md-4 border-end">
                     <div class="d-flex justify-content-center">
-                        <img :src="record.img ? record.img : '<?= base_url('img/no_profile.jpg') ?>'" class="rounded border w-100" alt="" style="max-width: 450px;">
+                        <img :src="record.img ? '<?= base_url() ?>'+record.img : '<?= base_url('img/no_profile.jpg') ?>'" class="rounded border w-100" alt="" style="max-width: 450px;">
                     </div>
 
                     <div class="d-flex justify-content-center mt-3">
@@ -26,8 +26,10 @@
                         </label>
                     </div>
 
+                    <div class="mt-3 mb-2 border-top"></div>
+
                     <div class="">
-                        <span class="badge text-bg-dark">Test</span>
+                        <a href="<?= base_url('/admin/print-id/' . $record['id']) ?>" target="_blank" class="btn btn-dark">Print ID Front</a>
                     </div>
                 </div>
 
@@ -71,12 +73,15 @@
                     <div class="row px-3">
                         <div class="col-md-6 border border-dark">
                             <label for="" class="form-label fw-semibold">TYPE OF DISABILITY</label>
-                            <p x-text="record.type_of_disability"></p>
+                            <p x-text="record.disability == 'Others' ? record.other_disability : record.disability" class="text-uppercase"></p>
                         </div>
 
                         <div class="col-md-6 border border-dark">
                             <label for="" class="form-label fw-semibold">CAUSE OF DISABILITY</label>
-                            <p x-text="record.cause_of_disability"></p>
+                            <div class="">
+                                <span x-text="cause_of.find(e => e.id == record.cause_of)?.label" class="badge text-bg-dark"></span>
+                                <p x-text="record.title == 'Others' ? record.other_cause : record.title" class="text-uppercase"></p>
+                            </div>
                         </div>
                     </div>
                     <div class="row px-3">
@@ -165,7 +170,7 @@
                         </div>
                         <div class="col-md-4 border border-dark">
                             <label for="" class="form-label fw-semibold">OCCUPATION</label>
-                            <p x-text="record.occupation"></p>
+                            <p x-text="record.occupation_name == 'Other' ? record.other_occupation : record.occupation_name"></p>
                         </div>
                     </div>
                     <div class="row px-3">
@@ -726,6 +731,15 @@
                     'label': 'WIDOW/ER'
                 },
             ],
+            cause_of: [{
+                    'id': 0,
+                    'label': 'Congenital/Inborn'
+                },
+                {
+                    'id': 1,
+                    'label': 'Acquired'
+                },
+            ],
             id: <?= $record['id'] ?>,
             img: '',
             file: null,
@@ -1040,7 +1054,7 @@
                     }; // populate form with existing data
                     this.img = data.img;
                     // console.log(this.record);
-                    console.log(data.data);
+                    //console.log(data.data);
 
                 } catch (error) {
                     console.error('Error fetching records:', error);

@@ -129,6 +129,7 @@ class AddRecordPageController extends BaseController
 
                 'type_of_disability' => $req->getPost('type_of_disability'),
                 'cause_of_disability' => $req->getPost('cause'),
+                'cause_of' => $req->getPost('cause_of'),
                 'other_cause' => $req->getPost('other_cause'),
 
                 'civil_status' => $req->getPost('civil_status'),
