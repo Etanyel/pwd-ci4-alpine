@@ -24,23 +24,16 @@ class AddRecordPageController extends BaseController
     {
         $model = new CauseOfDisability;
 
-        if ($num > 2) {
-            return $this->response->setJSON([
-                'status' => 'error'
-            ]);
-        }
+        // if ($num > 2) {
+        //     return $this->response->setJSON([
+        //         'status' => 'error'
+        //     ]);
+        // }
 
-        $cause = null;
-        if ($num == 2) {
-            $cause = 0;
-        } else {
-            $cause = 1;
-        }
-
-
+        // $cause = $num;
         return $this->response->setJSON([
             'status' => 'success',
-            'cause' => $model->where('cause', $cause)->findAll()
+            'cause' => $model->where('cause', $num)->findAll()
         ]);
     }
 

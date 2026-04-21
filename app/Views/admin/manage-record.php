@@ -10,19 +10,19 @@
 <?= $this->section('content'); ?>
 
 <div class="" x-data="ManageRecordPage()">
-    <div x-show="updateBtn === false">
+    <div x-show="!updateBtn">
         <div class="card shadow-sm mt-3 p-3 border-0">
             <div class="row">
                 <div class="col-md-4 border-end">
                     <div class="d-flex justify-content-center">
-                        <img :src="record.img ? '<?= base_url() ?>'+record.img : '<?= base_url('img/no_profile.jpg') ?>'" class="rounded border w-100" alt="" style="max-width: 450px;">
+                        <img :src="record.img ? '<?= base_url() ?>' + record.img : '<?= base_url('img/no_profile.jpg') ?>'" class="rounded border w-100" alt="" style="max-width: 450px;">
                     </div>
 
                     <div class="d-flex justify-content-center mt-3">
                         <label class="btn btn-light form-control border d-flex align-items-center justify-content-center">
                             <i class="bi bi-upload me-2"></i>
-                            <span x-text="img ? 'Update Photo' : 'Upload Photo'"></span>
-                            <input type="file" class="d-none" @change="previewPhoto">
+                            <span x-text="file ? 'Update Photo' : 'Upload Photo'"></span>
+                            <input type="file" class="d-none" @change="previewPhoto" accept="image/*">
                         </label>
                     </div>
 
@@ -179,8 +179,8 @@
                             <p x-text="record.bloodtype ? record.bloodtype : 'N/A'"></p>
                         </div>
                         <div class="col-md-4 border border-dark">
-                            <label for="" class="form-label fw-semibold">ORGANIZATION AFFLIATED</label>
-                            <p>Organization Affliated: <span x-text="record.organization_affiliated ? record.organization_affiliated : 'N/A'"></span></p>
+                            <label for="" class="form-label fw-semibold">ORGANIZATION AFFILIATED</label>
+                            <p>Organization Affiliated: <span x-text="record.organization_affiliated ? record.organization_affiliated : 'N/A'"></span></p>
                             <p>Contact Person: <span x-text="record.contact_person ? record.contact_person : 'N/A'"></span></p>
                             <p>Office Address: <span x-text="record.office_address ? record.office_address : 'N/A'"></span></p>
                             <p></p>
@@ -220,6 +220,7 @@
                     <h3 class="text-primary text-center">Update Information</h3>
                     <hr>
                 </div>
+
                 <!-- PWD NUMBER -->
                 <div class="mb-3">
                     <div class="row">
@@ -229,13 +230,12 @@
                                 class="form-control"
                                 :class="errors.pwd_no ? 'border-danger' : ''"
                                 placeholder="(RR-PPMM-BBB-NNNNNNNN)" required
-                                @input="formatPwdNo" maxlength="20"
-                                :value="record.pwd_no">
+                                @input="formatPwdNo" maxlength="20">
                             <p class="text-danger fw-semibold" x-text="errors.pwd_no"></p>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">2. DATE APPLIED <span :class="form.date_applied.length == 0 ? 'text-danger' : 'd-none'">*</span></label>
-                            <input type="date" class="form-control" :value="record.date_applied" :class="errors.date_applied ? 'border-danger' : ''" x-model="form.date_applied" required>
+                            <input type="date" class="form-control" :class="errors.date_applied ? 'border-danger' : ''" x-model="form.date_applied" required>
                             <p class="text-danger fw-semibold" x-text="errors.date_applied"></p>
                         </div>
                     </div>
@@ -246,7 +246,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">3. LAST NAME <span :class="form.lastname.length == 0 ? 'text-danger' : 'd-none'">*</span></label>
-                            <input type="text" class="form-control" :value="record.lastname" x-model="form.lastname" :class="errors.lastname ? 'border-danger' : ''" placeholder="eg. DELA CRUZ" required>
+                            <input type="text" class="form-control" x-model="form.lastname" :class="errors.lastname ? 'border-danger' : ''" placeholder="eg. DELA CRUZ" required>
                             <p class="text-danger fw-semibold" x-text="errors.lastname"></p>
                         </div>
                         <div class="col-md-4">
@@ -256,12 +256,12 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">MIDDLE NAME <span class="text-muted" style="font-size: 13px;">(optional)</span></label>
-                            <input type="text" class="form-control" :value="record.middlename" x-model="form.middlename" :class="errors.middlename ? 'border-danger' : ''" placeholder="eg. D." maxlength="1">
+                            <input type="text" class="form-control" x-model="form.middlename" :class="errors.middlename ? 'border-danger' : ''" placeholder="eg. D.">
                             <p class="text-danger fw-semibold" x-text="errors.middlename"></p>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">SUFFIX <span class="text-muted" style="font-size: 13px;">(optional)</span></label>
-                            <input type="text" class="form-control" :value="record.suffix" x-model="form.suffix" :class="errors.suffix ? 'border-danger' : ''" placeholder="eg. JR., SR., III" maxlength="1">
+                            <input type="text" class="form-control" x-model="form.suffix" :class="errors.suffix ? 'border-danger' : ''" placeholder="eg. JR., SR., III">
                             <p class="text-danger fw-semibold" x-text="errors.suffix"></p>
                         </div>
                     </div>
@@ -271,44 +271,45 @@
                 <div class="mb-3">
                     <div class="row">
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">4. TYPE OF DISABILITY <span :class="form.typeDisability == '' ? 'text-danger' : 'd-none'">*</span></label>
-                            <select class="form-select" :value="record.type_of_disability" x-model="form.typeDisability" :class="errors.type_of_disability ? 'border-danger' : ''">
+                            <label class="form-label fw-semibold">4. TYPE OF DISABILITY <span :class="form.type_of_disability == '' ? 'text-danger' : 'd-none'">*</span></label>
+                            <select class="form-select" x-model="form.type_of_disability" :class="errors.type_of_disability ? 'border-danger' : ''" required>
+                                <option value="">Select Disability</option>
                                 <template x-for="item in disability" :key="item.id">
-                                    <option :value="item.id"><span x-text="item.disability"></span></option>
+                                    <option x-bind:selected="record.cause_of_disability == item.id" :value="item.id"><span x-text="item.disability"></span></option>
                                 </template>
                             </select>
                             <p class="text-danger fw-semibold" x-text="errors.type_of_disability"></p>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">5. CAUSE OF DISABILITY <span :class="form.causeOfDisability == '' ? 'text-danger' : 'd-none'">*</span></label>
-
+                            <label class="form-label fw-semibold">5. CAUSE OF DISABILITY <span :class="form.cause_of == '' ? 'text-danger' : 'd-none'">*</span></label>
                             <select class="form-select"
-                                x-model="form.causeOfDisability"
+                                x-model="form.cause_of"
                                 @change="causeOf()" required
-                                :class="errors.cause_of_disability ? 'border-danger' : ''" :value="record.cause_of_disability">
+                                :class="errors.cause_of ? 'border-danger' : ''">
                                 <option value="">Select Type</option>
-                                <option value="2">Congenital/Inborn</option>
+                                <option value="0">Congenital/Inborn</option>
                                 <option value="1">Acquired</option>
                             </select>
-                            <p class="text-danger fw-semibold" x-text="errors.cause_of_disability"></p>
+                            <p class="text-danger fw-semibold" x-text="errors.cause_of"></p>
                         </div>
 
                         <template x-if="cause_title.length > 0">
-                            <div :class="form.cause == 8 ? 'col-md-2' : 'col-md-4'">
-                                <label for="" class="form-label fw-semibold">CAUSE <span :class="form.cause == '' ? 'text-danger' : 'd-none'">*</span></label>
-                                <select class="form-select" x-model="form.cause" :value="record.cause" :class="errors.cause ? 'border-danger' : ''" required>
+                            <div :class="form.cause_of_disability == 8 ? 'col-md-2' : 'col-md-4'">
+                                <label for="" class="form-label fw-semibold">CAUSE <span :class="form.cause_of_disability == '' ? 'text-danger' : 'd-none'">*</span></label>
+                                <select class="form-select" x-model="form.cause_of_disability" :class="errors.cause_of_disability ? 'border-danger' : ''" required>
                                     <option value="">Select cause</option>
-                                    <template x-for="title in cause_title" :key="title.id">
-                                        <option :value="title.cause_id"><span x-text="title.title"></span></option>
+                                    <template x-for="title in cause_title" :key="title.cause_id">
+                                        <option :selected="record.cause_of_disability == title.cause_id" :value="title.cause_id"><span x-text="title.title"></span></option>
                                     </template>
                                 </select>
+                                <p class="text-danger fw-semibold" x-text="errors.cause_of_disability"></p>
                             </div>
                         </template>
 
-                        <template x-if="form.cause == 8">
+                        <template x-if="form.cause_of_disability == 8">
                             <div class="col-md-2">
                                 <label class="form-label fw-semibold">Other Cause</label>
-                                <input type="text" x-model="form.other_cause" :value="record.other_cause" :class="errors.other_cause ? 'border-danger' : ''" class="form-control" placeholder="Other cause of disability" required>
+                                <input type="text" x-model="form.other_cause" :class="errors.other_cause ? 'border-danger' : ''" class="form-control" placeholder="Other cause of disability">
                                 <p class="text-danger fw-semibold" x-text="errors.other_cause"></p>
                             </div>
                         </template>
@@ -347,13 +348,13 @@
                         <!-- CITY -->
                         <div class="col-md-2">
                             <label for="" class="form-label fw-semibold">CITY/MUNICIPALITY <span :class="form.city == '' ? 'text-danger' : 'd-none'">*</span></label>
-                            <select class="form-select" x-model="form.city" :class="errors.city_municipality ? 'border-danger' : ''" @change="fetchBarangays" :disabled="form.province == ''">
+                            <select class="form-select" x-model="form.city" :class="errors.city ? 'border-danger' : ''" @change="fetchBarangays" :disabled="form.province == ''">
                                 <option value="">Select City</option>
                                 <template x-for="c in cities" :key="c.code">
                                     <option :value="c.code" x-text="c.name"></option>
                                 </template>
                             </select>
-                            <p class="text-danger fw-semibold" x-text="errors.city_municipality"></p>
+                            <p class="text-danger fw-semibold" x-text="errors.city"></p>
                         </div>
 
                         <!-- BARANGAY -->
@@ -366,19 +367,17 @@
                                         <option :value="b.code" x-text="b.name"></option>
                                     </template>
                                 </select>
-                                <p class="text-danger fw-semibold" x-text="errors.barangay"></p>
                             </template>
-
                             <template x-if="barangays.length == 0">
                                 <input type="text" class="form-control" :disabled="form.city == ''" placeholder="Enter barangay" x-model="form.barangay" required>
-                                <p class="text-danger fw-semibold" x-text="errors.barangay"></p>
                             </template>
+                            <p class="text-danger fw-semibold" x-text="errors.barangay"></p>
                         </div>
 
                         <!-- Street Name -->
                         <div class="col-md-2">
                             <label for="" class="form-label fw-semibold">STREET NAME/PUROK <span :class="form.street_name == '' ? 'text-danger' : 'd-none'">*</span></label>
-                            <input type="text" class="form-control" :value="record.street_name" x-model="form.street_name" :class="errors.street_name ? 'border-danger' : ''" placeholder="Enter Purok" :disabled="form.barangay == ''">
+                            <input type="text" class="form-control" x-model="form.street_name" :class="errors.street_name ? 'border-danger' : ''" placeholder="Enter Purok" :disabled="form.barangay == ''">
                             <p class="text-danger fw-semibold" x-text="errors.street_name"></p>
                         </div>
                     </div>
@@ -387,24 +386,24 @@
 
                 <!-- Contact Details -->
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">6. CONTACT DETAILS</label>
+                    <label class="form-label fw-semibold">7. CONTACT DETAILS</label>
                     <div class="row">
                         <!-- landline -->
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">LANDLINE</label>
-                            <input type="text" x-model="form.landline" :value="record.landline" :class="errors.landline ? 'border-danger' : ''" class="form-control" placeholder="123-456-789">
+                            <input type="text" x-model="form.landline" :class="errors.landline ? 'border-danger' : ''" class="form-control" placeholder="123-456-789">
                         </div>
 
                         <!-- mobile number -->
                         <div class="col-md-4">
                             <label for="" class="form-label fw-semibold">MOBILE NUMBER</label>
-                            <input type="text" class="form-control" :value="record.mobile_no" :class="errors.mobile_no ? 'border-danger' : ''" x-model="form.mobile_no" placeholder="09123456789">
+                            <input type="text" class="form-control" :class="errors.mobile_no ? 'border-danger' : ''" x-model="form.mobile_no" placeholder="09123456789">
                         </div>
 
                         <!-- Email Address -->
                         <div class="col-md-4">
                             <label for="" class="form-label fw-semibold">EMAIL ADDRESS</label>
-                            <input type="email" class="form-control" :value="record.email" :class="errors.email ? 'border-danger' : ''" x-model="form.email" placeholder="josemariechan@example.com">
+                            <input type="email" class="form-control" :class="errors.email ? 'border-danger' : ''" x-model="form.email" placeholder="example@example.com">
                         </div>
                     </div>
                 </div>
@@ -415,7 +414,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <label for="" class="form-label fw-semibold">8. DATE OF BIRTH <span :class="form.birthdate == '' ? 'text-danger' : 'd-none'">*</span></label>
-                            <input type="date" :value="form.birthdate" x-model="form.birthdate" class="form-control" :class="errors.birthdate ? 'border-danger' : ''">
+                            <input type="date" x-model="form.birthdate" class="form-control" :class="errors.birthdate ? 'border-danger' : ''">
                             <p class="text-danger fw-semibold" x-text="errors.birthdate"></p>
                         </div>
 
@@ -430,12 +429,12 @@
                         </div>
                         <div class="col-md-2">
                             <label for="" class="form-label fw-semibold">Age</label>
-                            <input type="text" readonly :value="age" class="form-control" :class="errors.age ? 'border-danger' : ''">
+                            <input type="text" readonly :value="age" class="form-control">
                         </div>
 
                         <div class="col-md-4">
                             <label for="" class="form-label fw-semibold">10. CIVIL STATUS <span :class="form.civil_status == '' ? 'text-danger' : 'd-none'">*</span></label>
-                            <select class="form-select" :value="record.civil_status" x-model="form.civil_status" :class="errors.civil_status ? 'border-danger' : ''">
+                            <select class="form-select" x-model="form.civil_status" :class="errors.civil_status ? 'border-danger' : ''">
                                 <option value="">Select Civil Status</option>
                                 <option value="0">Single</option>
                                 <option value="1">Married</option>
@@ -452,7 +451,7 @@
                     <div class="row">
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">11. EDUCATIONAL ATTAINMENT <span :class="form.educational_attainment == '' ? 'text-danger' : 'd-none'">*</span></label>
-                            <select class="form-select" :value="record.educational_attainment" x-model="form.educational_attainment" :class="errors.educational_attainment ? 'border-danger' : ''">
+                            <select class="form-select" x-model="form.educational_attainment" :class="errors.educational_attainment ? 'border-danger' : ''">
                                 <option value="">Select Educational Attainment</option>
                                 <option value="0">None</option>
                                 <option value="1">Kindergarten</option>
@@ -467,7 +466,8 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">12. EMPLOYMENT STATUS <span :class="form.employment_status == '' ? 'text-danger' : 'd-none'">*</span></label>
-                            <select class="form-select" :value="record.employment_status" x-model="form.employment_status" :class="errors.employment_status ? 'border-danger' : ''">
+                            <select class="form-select" x-model="form.employment_status" :class="errors.employment_status ? 'border-danger' : ''">
+                                <option value="">Select Employment Status</option>
                                 <option value="0">Employed</option>
                                 <option value="1">Unemployed</option>
                                 <option value="2">Self-Employed</option>
@@ -477,8 +477,8 @@
 
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">12.1 CATEGORY OF EMPLOYMENT</label>
-                            <select class="form-select" :value="record.category_of_employment" x-model="form.category_of_employment" :class="errors.category_of_employment ? 'border-danger' : ''">
-                                <option value="0">Select Category</option>
+                            <select class="form-select" x-model="form.category_of_employment" :class="errors.category_of_employment ? 'border-danger' : ''">
+                                <option value="">Select Category</option>
                                 <option value="0">Government</option>
                                 <option value="1">Private</option>
                             </select>
@@ -487,7 +487,7 @@
 
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">12.2 NATURE OF EMPLOYMENT <span :class="form.nature_of_employment == '' ? 'text-danger' : 'd-none'">*</span></label>
-                            <select class="form-select" :value="record.nature_of_employment" x-model="form.nature_of_employment" :class="errors.nature_of_employment ? 'border-danger' : ''">
+                            <select class="form-select" x-model="form.nature_of_employment" :class="errors.nature_of_employment ? 'border-danger' : ''">
                                 <option value="">Select nature of employment</option>
                                 <option value="0">Casual</option>
                                 <option value="1">Seasonal</option>
@@ -498,8 +498,9 @@
 
                         <div :class="form.occupation == 11 ? 'col-md-2' : 'col-md-4'">
                             <label class="form-label fw-semibold">13. OCCUPATION <span :class="form.occupation == '' ? 'text-danger' : 'd-none'">*</span></label>
-                            <select class="form-select" :value="record.occupation" x-model="form.occupation" :class="errors.occupation ? 'border-danger' : ''">
-                                <template x-for="item in occupation" :key="item.id">
+                            <select class="form-select" x-model="form.occupation" :class="errors.occupation ? 'border-danger' : ''">
+                                <option value="">Select Occupation</option>
+                                <template x-for="item in occupation" :key="item.occupation_id">
                                     <option :value="item.occupation_id"><span x-text="item.occupation_name"></span></option>
                                 </template>
                             </select>
@@ -509,11 +510,10 @@
                         <template x-if="form.occupation == 11">
                             <div class="col-2">
                                 <label class="form-label fw-semibold">Other Occupation <span :class="form.other_occupation == '' ? 'text-danger' : 'd-none'">*</span></label>
-                                <input type="text" placeholder="Enter other occupation" :value="record.other_occupation" class="form-control" x-model="form.other_occupation" required :class="errors.other_occupation ? 'border-danger' : ''">
+                                <input type="text" placeholder="Enter other occupation" class="form-control" x-model="form.other_occupation" :class="errors.other_occupation ? 'border-danger' : ''">
                                 <p class="text-danger fw-semibold" x-text="errors.other_occupation"></p>
                             </div>
                         </template>
-
                     </div>
                 </div>
 
@@ -521,7 +521,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">14. BLOOD TYPE</label>
-                            <select class="form-select" :value="record.bloodtype" x-model="form.bloodtype" :class="errors.bloodtype ? 'border-danger' : ''">
+                            <select class="form-select" x-model="form.bloodtype" :class="errors.bloodtype ? 'border-danger' : ''">
                                 <option value="">Select Blood Type</option>
                                 <option value="A+">A+</option>
                                 <option value="A-">A-</option>
@@ -534,37 +534,37 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="" class="form-label fw-semibold">15. ORGANIZATION AFFLIATED</label>
+                            <label for="" class="form-label fw-semibold">15. ORGANIZATION AFFILIATED</label>
                             <div class="mb-2">
-                                <label class="form-label">Organization Affliated</label>
-                                <input type="text" :value="record.organization_affliated" class="form-control" x-model="form.organization_affliated" :class="errors.organization_affliated ? 'border-danger' : ''">
+                                <label class="form-label">Organization Affiliated</label>
+                                <input type="text" class="form-control" x-model="form.organization_affiliated" :class="errors.organization_affiliated ? 'border-danger' : ''">
                             </div>
                             <div class="mb-2">
                                 <label class="form-label">Contact Person</label>
-                                <input type="text" :value="record.contact_person" class="form-control" x-model="form.contact_person" :class="errors.contact_person ? 'border-danger' : ''">
+                                <input type="text" class="form-control" x-model="form.contact_person" :class="errors.contact_person ? 'border-danger' : ''">
                             </div>
                             <div class="mb-2">
                                 <label class="form-label">Office Address</label>
-                                <input type="text" :value="record.office_address" class="form-control" x-model="form.office_address" :class="errors.office_address ? 'border-danger' : ''">
+                                <input type="text" class="form-control" x-model="form.office_address" :class="errors.office_address ? 'border-danger' : ''">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">16. ID REFERENCE NO.</label>
                             <div class="mb-2">
                                 <label class="form-label">SSS NO.</label>
-                                <input type="text" :value="record.sss_no" class="form-control" x-model="form.sss_no" :class="errors.sss_no ? 'border-danger' : ''">
+                                <input type="text" class="form-control" x-model="form.sss_no" :class="errors.sss_no ? 'border-danger' : ''">
                             </div>
                             <div class="mb-2">
                                 <label class="form-label">GSIS NO.</label>
-                                <input type="text" :value="record.gsis_no" class="form-control" x-model="form.gsis_no" :class="errors.gsis_no ? 'border-danger' : ''">
+                                <input type="text" class="form-control" x-model="form.gsis_no" :class="errors.gsis_no ? 'border-danger' : ''">
                             </div>
                             <div class="mb-2">
                                 <label class="form-label">PSN NO.</label>
-                                <input type="text" :value="record.psn_no" class="form-control" x-model="form.psn_no" :class="errors.psn_no ? 'border-danger' : ''">
+                                <input type="text" class="form-control" x-model="form.psn_no" :class="errors.psn_no ? 'border-danger' : ''">
                             </div>
                             <div class="mb-2">
                                 <label class="form-label">PHILHEALTH NO.</label>
-                                <input type="text" :value="record.philhealth_no" class="form-control" x-model="form.philhealth_no" :class="errors.philhealth_no ? 'border-danger' : ''">
+                                <input type="text" class="form-control" x-model="form.philhealth_no" :class="errors.philhealth_no ? 'border-danger' : ''">
                             </div>
                         </div>
                     </div>
@@ -611,17 +611,14 @@
 
                 <div class="mt-5">
                     <button class="btn btn-dark" type="submit">Update Info</button>
-                    <button class="btn btn-secondary" type="button" @click="updateBtn = false">Cancel</button>
+                    <button class="btn btn-secondary" type="button" @click="cancelUpdate">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
-
 </div>
 
-
 <?= $this->endSection(); ?>
-
 
 <!-- Scripts -->
 <?= $this->section('scripts'); ?>
@@ -629,7 +626,7 @@
     function ManageRecordPage() {
         return {
             errors: {},
-            record: [],
+            record: {},
             updateBtn: false,
             cause_title: [],
             disability: [],
@@ -649,7 +646,7 @@
                 {
                     'id': 2,
                     'label': 'SELF-EMPLOYED'
-                },
+                }
             ],
             educational_attainment: [{
                     'id': 0,
@@ -681,8 +678,8 @@
                 },
                 {
                     'id': 7,
-                    'label': 'POST GRADUTE'
-                },
+                    'label': 'POST GRADUATE'
+                }
             ],
             category_of_employment: [{
                     'id': 0,
@@ -691,7 +688,7 @@
                 {
                     'id': 1,
                     'label': 'PRIVATE'
-                },
+                }
             ],
             nature_of_employment: [{
                     'id': 0,
@@ -708,7 +705,7 @@
                 {
                     'id': 3,
                     'label': 'EMERGENCY'
-                },
+                }
             ],
             civil_status: [{
                     'id': 0,
@@ -716,20 +713,20 @@
                 },
                 {
                     'id': 1,
-                    'label': 'SEPARATED'
-                },
-                {
-                    'id': 2,
-                    'label': 'COHABITATION (LIVE-IN)'
-                },
-                {
-                    'id': 3,
                     'label': 'MARRIED'
                 },
                 {
-                    'id': 4,
+                    'id': 2,
+                    'label': 'SEPARATED'
+                },
+                {
+                    'id': 3,
                     'label': 'WIDOW/ER'
                 },
+                {
+                    'id': 4,
+                    'label': 'COHABITATION (LIVE-IN)'
+                }
             ],
             cause_of: [{
                     'id': 0,
@@ -738,62 +735,10 @@
                 {
                     'id': 1,
                     'label': 'Acquired'
-                },
+                }
             ],
             id: <?= $record['id'] ?>,
-            img: '',
             file: null,
-
-
-            previewPhoto(event) {
-                const selectedFile = event.target.files[0];
-                if (!selectedFile) return;
-
-                if (!selectedFile.type.startsWith('image/')) {
-                    alert('Please select an image file.');
-                    return;
-                }
-
-                this.file = selectedFile;
-
-                // Preview the image
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.img = e.target.result; // show preview
-                };
-                reader.readAsDataURL(selectedFile);
-
-                // Immediately upload to server
-                this.uploadPhoto();
-            },
-
-            async uploadPhoto() {
-                if (!this.file) return;
-
-                const formData = new FormData();
-                formData.append('img', this.file); // append actual file
-                formData.append('id', this.id); // pass user ID
-
-                try {
-                    const res = await fetch('<?= base_url("admin/upload-person-photo") ?>', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    const data = await res.json();
-
-                    if (data.status === 'success') {
-                        Swal.fire('Success', 'Profile photo updated!', 'success');
-                        this.fetchRecord();
-                    } else {
-                        Swal.fire('Error', data.message || 'Upload failed!', 'error');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    Swal.fire('Error', 'Something went wrong!', 'error');
-                }
-            },
-
 
             form: {
                 pwd_no: '',
@@ -802,9 +747,10 @@
                 firstname: '',
                 middlename: '',
                 suffix: '',
-                typeDisability: '',
-                causeOfDisability: '',
-                cause: '',
+                type_of_disability: '',
+                cause_of: '',
+                cause_of_disability: '',
+                other_cause: '',
                 region: '',
                 province: '',
                 city: '',
@@ -823,7 +769,7 @@
                 occupation: '',
                 other_occupation: '',
                 bloodtype: '',
-                organization_affliated: '',
+                organization_affiliated: '',
                 office_address: '',
                 contact_person: '',
                 sss_no: '',
@@ -842,6 +788,11 @@
                 this.errors = {};
             },
 
+            cancelUpdate() {
+                this.updateBtn = false;
+                this.fetchRecord(); // Reload original data
+            },
+
             init() {
                 this.fetchRecord();
                 this.fetchOccupation();
@@ -851,62 +802,37 @@
 
             async updateRecord() {
                 const formData = new FormData();
-                formData.append('pwd_no', this.form.pwd_no);
-                formData.append('date_applied', this.form.date_applied);
-                formData.append('lastname', this.form.lastname);
-                formData.append('firstname', this.form.firstname);
-                formData.append('middlename', this.form.middlename);
-                formData.append('suffix', this.form.suffix);
-                formData.append('type_of_disability', this.form.typeDisability);
-                formData.append('cause', this.form.cause);
-                formData.append('other_cause', this.form.other_cause);
-                formData.append('region', this.form.region);
-                formData.append('province', this.form.province);
-                formData.append('city', this.form.city);
-                formData.append('barangay', this.form.barangay);
-                formData.append('street_name', this.form.street_name);
-                formData.append('landline', this.form.landline);
-                formData.append('mobile_no', this.form.mobile_no);
-                formData.append('email', this.form.email);
-                formData.append('birthdate', this.form.birthdate);
-                formData.append('age', this.age);
-                formData.append('sex', this.form.sex);
-                formData.append('civil_status', this.form.civil_status);
-                formData.append('educational_attainment', this.form.educational_attainment);
-                formData.append('employment_status', this.form.employment_status);
-                formData.append('category_of_employment', this.form.category_of_employment);
-                formData.append('nature_of_employment', this.form.nature_of_employment);
-                formData.append('occupation', this.form.occupation);
-                formData.append('other_occupation', this.form.other_occupation);
-                formData.append('bloodtype', this.form.bloodtype);
-                formData.append('organization_affliated', this.form.organization_affliated);
-                formData.append('office_address', this.form.office_address);
-                formData.append('contact_person', this.form.contact_person);
-                formData.append('sss_no', this.form.sss_no);
-                formData.append('gsis_no', this.form.gsis_no);
-                formData.append('psn_no', this.form.psn_no);
-                formData.append('philhealth_no', this.form.philhealth_no);
-                formData.append('fathers_lastname', this.form.fathers_lastname);
-                formData.append('fathers_firstname', this.form.fathers_firstname);
-                formData.append('fathers_middlename', this.form.fathers_middlename);
-                formData.append('mothers_lastname', this.form.mothers_lastname);
-                formData.append('mothers_firstname', this.form.mothers_firstname);
-                formData.append('mothers_middlename', this.form.mothers_middlename);
 
-                const res = await fetch('/admin/update-record/<?= $record['id'] ?>', {
-                    method: 'POST',
-                    body: formData
+                // Append all form fields
+                Object.keys(this.form).forEach(key => {
+                    if (this.form[key] !== null && this.form[key] !== undefined) {
+                        formData.append(key, this.form[key]);
+                    }
                 });
 
-                const data = await res.json();
+                formData.append('age', this.age);
+                formData.append('id', this.id);
 
-                if (data.status === 'error') {
-                    this.errors = data.errors;
-                    console.error(data.errors);
-                    return;
-                } else {
-                    this.resetForm();
-                    Swal.fire('Updated Success', data.message, 'success');
+                try {
+                    const res = await fetch('/admin/update-record/<?= $record['id'] ?>', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await res.json();
+
+                    if (data.status === 'error') {
+                        this.errors = data.errors;
+                        await Swal.fire('Error', 'Please check the form for errors', 'error');
+                    } else {
+                        this.resetForm();
+                        await Swal.fire('Success', data.message, 'success');
+                        this.updateBtn = false;
+                        this.fetchRecord(); // Reload the updated record
+                    }
+                } catch (error) {
+                    console.error('Update error:', error);
+                    await Swal.fire('Error', 'Something went wrong!', 'error');
                 }
             },
 
@@ -914,9 +840,7 @@
                 try {
                     const res = await fetch('<?= base_url('/admin/fetch-disability') ?>');
                     const data = await res.json();
-                    if (data.status == 'error') {
-                        console.error(data.error);
-                    } else {
+                    if (data.status === 'success') {
                         this.disability = data.data;
                     }
                 } catch (error) {
@@ -924,16 +848,15 @@
                 }
             },
 
-
             async causeOf() {
-                if (!this.form.causeOfDisability) {
+                if (!this.form.cause_of && this.form.cause_of !== 0) {
                     this.cause_title = [];
-                    this.form.cause = '';
+                    this.form.cause_of_disability = '';
                     return;
                 }
 
                 try {
-                    const url = `<?= base_url('/admin/fetch-cause/') ?>${this.form.causeOfDisability}`;
+                    const url = `<?= base_url('/admin/fetch-cause/') ?>${this.form.cause_of}`;
                     const res = await fetch(url);
                     const data = await res.json();
 
@@ -949,75 +872,85 @@
                 try {
                     const res = await fetch('<?= base_url('fetch-occupation') ?>');
                     const data = await res.json();
-
-                    if (data.status == 'error') {
-                        console.error(data.errors);
+                    if (data.status === 'success') {
+                        this.occupation = data.data;
                     }
-
-                    this.occupation = data.data;
                 } catch (err) {
                     console.error(err);
                 }
             },
 
             async fetchRegions() {
-                const res = await fetch('<?= base_url('/fetch-regions') ?>');
-                const regions = await res.json();
-                this.regions = regions.regions;
-                // console.log(regions);
+                try {
+                    const res = await fetch('<?= base_url('/fetch-regions') ?>');
+                    const regions = await res.json();
+                    this.regions = regions.regions || [];
+                } catch (error) {
+                    console.error(error);
+                }
             },
 
             async fetchProvinces() {
+                if (!this.form.region) {
+                    this.provinces = [];
+                    return;
+                }
+
                 this.provinces = [];
                 this.cities = [];
                 this.barangays = [];
 
-                const res = await fetch(`/fetch-province/${this.form.region}`);
-                const data = await res.json();
-
-                // console.log(data.provinces);
-                this.provinces = data.provinces;
+                try {
+                    const res = await fetch(`/fetch-province/${this.form.region}`);
+                    const data = await res.json();
+                    this.provinces = data.provinces || [];
+                } catch (error) {
+                    console.error(error);
+                }
             },
 
             async fetchCities() {
+                if (!this.form.province) {
+                    this.cities = [];
+                    return;
+                }
+
                 this.cities = [];
                 this.barangays = [];
 
-                const res = await fetch(`/fetch-cities/${this.form.province}`);
-                const data = await res.json();
-
-                // console.log(data.cities);
-                this.cities = data.cities;
+                try {
+                    const res = await fetch(`/fetch-cities/${this.form.province}`);
+                    const data = await res.json();
+                    this.cities = data.cities || [];
+                } catch (error) {
+                    console.error(error);
+                }
             },
 
             async fetchBarangays() {
-                const res = await fetch(`/fetch-barangays/${this.form.city}`);
-                const data = await res.json();
+                if (!this.form.city) {
+                    this.barangays = [];
+                    return;
+                }
 
-                this.barangays = data.barangays;
-
-                // console.log('BARANGAY: ' + this.barangays);
+                try {
+                    const res = await fetch(`/fetch-barangays/${this.form.city}`);
+                    const data = await res.json();
+                    this.barangays = data.barangays || [];
+                } catch (error) {
+                    console.error(error);
+                }
             },
 
             get age() {
-                // If no birthdate yet, show empty
                 if (!this.form.birthdate) return '';
 
-                const today = new Date(); // current date
-                const birthDate = new Date(this.form.birthdate); // user's birthdate
-
-                // Step 1: basic age (year difference)
+                const today = new Date();
+                const birthDate = new Date(this.form.birthdate);
                 let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
 
-                // Step 2: check if birthday already happened this year
-                const currentMonth = today.getMonth();
-                const birthMonth = birthDate.getMonth();
-
-                const currentDay = today.getDate();
-                const birthDay = birthDate.getDate();
-
-                // Step 3: if birthday hasn't happened yet, subtract 1
-                if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
                     age--;
                 }
 
@@ -1025,11 +958,9 @@
             },
 
             formatPwdNo(e) {
-                let value = e.target.value.replace(/\D/g, ''); // numbers only
-
+                let value = e.target.value.replace(/\D/g, '');
                 let parts = [];
 
-                // Pattern: 2-4-3-8
                 if (value.length > 0) parts.push(value.substring(0, 2));
                 if (value.length > 2) parts.push(value.substring(2, 6));
                 if (value.length > 6) parts.push(value.substring(6, 9));
@@ -1043,31 +974,132 @@
                     const response = await fetch('/admin/fetch-records/<?= $record['id'] ?>');
                     const data = await response.json();
 
-                    if (data.status === 'error') {
-                        console.error(data.errors);
-                        return;
+                    if (data.status === 'success') {
+                        this.record = data.data;
+
+                        // Populate form with existing data
+                        this.form = {
+                            pwd_no: data.data.pwd_no || '',
+                            date_applied: data.data.date_applied || '',
+                            lastname: data.data.lastname || '',
+                            firstname: data.data.firstname || '',
+                            middlename: data.data.middlename || '',
+                            suffix: data.data.suffix || '',
+                            type_of_disability: data.data.type_of_disability || '',
+                            cause_of: data.data.cause_of || '',
+                            cause_of_disability: data.data.cause_of_disability || '',
+                            other_cause: data.data.other_cause || '',
+                            region: data.data.region_code || '',
+                            province: data.data.province_code || '',
+                            city: data.data.city_code || '',
+                            barangay: data.data.barangay || '',
+                            street_name: data.data.street_name || '',
+                            landline: data.data.landline || '',
+                            mobile_no: data.data.mobile_no || '',
+                            email: data.data.email || '',
+                            birthdate: data.data.birthdate || '',
+                            sex: data.data.sex || '',
+                            civil_status: data.data.civil_status || '',
+                            educational_attainment: data.data.educational_attainment || '',
+                            employment_status: data.data.employment_status || '',
+                            category_of_employment: data.data.category_of_employment || '',
+                            nature_of_employment: data.data.nature_of_employment || '',
+                            occupation: data.data.occupation || '',
+                            other_occupation: data.data.other_occupation || '',
+                            bloodtype: data.data.bloodtype || '',
+                            organization_affiliated: data.data.organization_affiliated || '',
+                            office_address: data.data.office_address || '',
+                            contact_person: data.data.contact_person || '',
+                            sss_no: data.data.sss_no || '',
+                            gsis_no: data.data.gsis_no || '',
+                            psn_no: data.data.psn_no || '',
+                            philhealth_no: data.data.philhealth_no || '',
+                            fathers_lastname: data.data.fathers_lastname || '',
+                            fathers_firstname: data.data.fathers_firstname || '',
+                            fathers_middlename: data.data.fathers_middlename || '',
+                            mothers_lastname: data.data.mothers_lastname || '',
+                            mothers_firstname: data.data.mothers_firstname || '',
+                            mothers_middlename: data.data.mothers_middlename || ''
+                        };
+
+                        // Load cause options if cause_of exists
+                        if (this.form.cause_of !== '') {
+                            await this.causeOf();
+                        }
+
+                        // Load address dropdowns if region exists
+                        if (this.form.region) {
+                            await this.fetchProvinces();
+                            if (this.form.province) {
+                                await this.fetchCities();
+                                if (this.form.city) {
+                                    await this.fetchBarangays();
+                                }
+                            }
+                        }
                     }
-
-                    this.record = data.data;
-                    this.form = {
-                        ...data.data
-                    }; // populate form with existing data
-                    this.img = data.img;
-                    // console.log(this.record);
-                    //console.log(data.data);
-
                 } catch (error) {
                     console.error('Error fetching records:', error);
                 }
             },
 
+            previewPhoto(event) {
+                const selectedFile = event.target.files[0];
+                if (!selectedFile) return;
+
+                if (!selectedFile.type.startsWith('image/')) {
+                    Swal.fire('Error', 'Please select an image file.', 'error');
+                    return;
+                }
+
+                this.file = selectedFile;
+
+                // Preview the image
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.record.img = e.target.result;
+                };
+                reader.readAsDataURL(selectedFile);
+
+                // Immediately upload to server
+                this.uploadPhoto();
+            },
+
+            async uploadPhoto() {
+                if (!this.file) return;
+
+                const formData = new FormData();
+                formData.append('img', this.file);
+                formData.append('id', this.id);
+
+                try {
+                    const res = await fetch('<?= base_url("admin/upload-person-photo") ?>', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await res.json();
+
+                    if (data.status === 'success') {
+                        await Swal.fire('Success', 'Profile photo updated!', 'success');
+                        this.fetchRecord();
+                    } else {
+                        await Swal.fire('Error', data.message || 'Upload failed!', 'error');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    await Swal.fire('Error', 'Something went wrong!', 'error');
+                }
+            },
+
             formatDate(date) {
+                if (!date) return 'N/A';
                 return new Date(date).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
                 });
-            },
+            }
         }
     }
 </script>

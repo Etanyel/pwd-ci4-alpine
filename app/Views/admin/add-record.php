@@ -77,7 +77,7 @@
                             @change="causeOf()" required
                             :class="errors.cause_of_disability ? 'border-danger' : ''">
                             <option value="">Select Type</option>
-                            <option value="2">Congenital/Inborn</option>
+                            <option value="0">Congenital/Inborn</option>
                             <option value="1">Acquired</option>
                         </select>
                         <p class="text-danger fw-semibold" x-text="errors.cause_of_disability"></p>

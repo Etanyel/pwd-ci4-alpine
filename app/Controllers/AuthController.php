@@ -35,15 +35,6 @@ class AuthController extends BaseController
             if ($user['isActive'] == 1) {
                 $session = session();
 
-                $session->set([
-                    'userRole' => $user['role'],
-                    'userId' => $user['id'],
-                    'user_firstname' => $user['firstname'],
-                    'user_lastname' => $user['lastname'],
-                    'user_img' => $user['img'],
-                    'isLoggedIn' => true,
-                ]);
-
                 service('activitylog')->save([
                     'user_id' => $user['id'],
                     'tag_id' => null,
@@ -51,6 +42,15 @@ class AuthController extends BaseController
                     'ip_address' => service('request')->getIPAddress(),
                     'action' => 'Logged In',
                     'tag' => 'AUTH'
+                ]);
+
+                $session->set([
+                    'userRole' => $user['role'],
+                    'userId' => $user['id'],
+                    'user_firstname' => $user['firstname'],
+                    'user_lastname' => $user['lastname'],
+                    'user_img' => $user['img'],
+                    'isLoggedIn' => true,
                 ]);
 
                 $session->regenerate();
@@ -80,8 +80,15 @@ class AuthController extends BaseController
 
     public function logout()
     {
+        service('activitylog')->save([
+            'user_id' => session()->get('userId'),
+            'tag_id' => null,
+            'user_agent' => service('request')->getUserAgent()->getAgentString(),
+            'ip_address' => service('request')->getIPAddress(),
+            'action' => 'Logged Out',
+            'tag' => 'AUTH'
+        ]);
         session()->destroy();
-
         return redirect()->to('/');
     }
 }

@@ -138,8 +138,8 @@ class ManageRecordPageController extends BaseController
                 'gsis_no' => $request->getPost('gsis_no'),
                 'psn_no' => $request->getPost('psn_no'),
                 'philhealth_no' => $request->getPost('philhealth_no'),
-                'fathers_name' => strtoupper($request->getPost('fathers_firstname') . " " . $request->getPost('fathers_middlename') . ". " . $request->getPost('fathers_lastname')),
-                'mothers_name' => strtoupper($request->getPost('mothers_firstname') . " " . $request->getPost('mothers_middlename') . ". " . $request->getPost('mothers_lastname')),
+                'fathers_name' => strtoupper($request->getPost('fathers_firstname') . " " . ($request->getPost('fathers_middlename') != '' ? $request->getPost('fathers_middlename') : ". ") . " " . $request->getPost('fathers_lastname')),
+                'mothers_name' => strtoupper($request->getPost('mothers_firstname') . " " . ($request->getPost('mothers_middlename') != '' ? $request->getPost('mothers_middlename') :  ". ") . " " . $request->getPost('mothers_lastname')),
             ];
 
             // VALIDATION RULES
