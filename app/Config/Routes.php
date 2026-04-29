@@ -41,6 +41,8 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->post('/admin/upload-person-photo', 'ManageRecordPageController::uploadPhoto'); //update record based on id
 
         $routes->get('/admin/print-id/(:num)', 'ManageRecordPageController::printId/$1'); //print id based on id
+        $routes->get('/admin/print-id-back/(:num)', 'ManageRecordPageController::printBack/$1'); //print back id based on id
+        $routes->get('/admin/print/log/(:any)', 'ManageRecordPageController::printLog/$1'); //Make log when printing IDs
 
 
         // Manage User Page Index

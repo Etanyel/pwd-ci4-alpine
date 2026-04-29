@@ -51,41 +51,70 @@
             font-family: Arial, sans-serif;
         }
 
-        .name {
-            font-size: 10pt;
-            position: absolute;
-            bottom: 20mm;
+        .address {
+            font-size: x-small;
+            position: relative;
+            top: -2mm;
+            left: 14mm;
+            /* text-align: left; */
+        }
+
+        .birthdate {
+            font-size: x-small;
+            position: relative;
+            top: -.6mm;
+            left: 20mm;
+        }
+
+        .sex {
+            font-size: x-small;
+            position: relative;
+            top: -3.5mm;
+            left: 65mm;
+        }
+
+        .date_issued {
+            font-size: x-small;
+            position: relative;
+            top: -2mm;
+            left: 18mm;
+        }
+
+        .bloodtype {
+            font-size: x-small;
+            position: relative;
+            top: -5mm;
+            left: 68mm;
+        }
+
+        .valid {
+            font-size: x-small;
+            position: relative;
+            top: -3.5mm;
+            left: 18mm;
+        }
+
+        .status {
+            font-size: x-small;
+            position: relative;
+            top: -6.8mm;
+            left: 65mm;
+        }
+
+        .parent {
+            font-size: small;
+            position: relative;
+            top: 6mm;
+            left: -21mm;
             text-align: center;
-            left: 5mm;
-            font-weight: bold;
         }
 
-        .disability {
-            font-size: 8pt;
-            position: absolute;
-            bottom: 13mm;
-            left: 4mm;
+        .contactNumber {
+            font-size: small;
+            position: relative;
+            top: 2mm;
+            left: 24mm;
             text-align: center;
-            font-weight: bold;
-        }
-
-        .pwd_no {
-            font-size: 7pt;
-            position: absolute;
-            bottom: 28.2mm;
-            left: 9mm;
-            font-weight: bold;
-        }
-
-        .photo {
-            position: absolute;
-            right: -1mm;
-            left: 1;
-            top: 19mm;
-            width: 22mm;
-            height: 22mm;
-            object-fit: cover;
-            border: .2px solid #000;
         }
     </style>
 
@@ -94,33 +123,53 @@
 <body>
 
     <?php
-    $disability = $record['disability'];
-    $length = strlen($disability);
 
-    $fontSize = 8;
-    if ($length > 25) $fontSize = 7;
-    if ($length > 40) $fontSize = 6;
+
+    if ($person['fathers_name'] == null || empty($person['fathers_name'])) {
+        if ($person['mothers_name'] == null || empty($person['mothers_name'])) {
+            $parent = null;
+        } else {
+            $parent = $person['mothers_name'];
+        }
+    } else {
+        $parent = $person['fathers_name'];
+    }
+
+    // $issue_date = new DateTime(date('F j, Y'));
+    // $expiry_date = clone $issue_date;
+    // $expiry_date->modify('+5 years');
+    $issue_date = new DateTime();
+    $expiry_date = (clone $issue_date)->modify('+5 years');
     ?>
 
     <div class="card-container">
         <div class="card">
             <!-- Background -->
-            <img src="<?= base_url('id_template/id_front.png') ?>" class="bg">
+            <img src="<?= base_url('id_template/id_back.jpg') ?>" class="bg">
 
             <!-- Content -->
             <div class="content">
-                <div class="pwd_no"><?= $record['pwd_no'] ?></div>
-                <div class="name"><?= $record['firstname'] . ' ' . ($record['middlename'] == '' | null ? ' ' : $record['middlename'] . ' ') . $record['lastname'] ?></div>
-                <div class="disability" style="font-size: <?= $fontSize ?>pt;">
-                    <?= $disability ?>
-                </div>
+                <div class="address"><?= $person['barangay'] . ', ' . $person['city_municipality'] ?></div>
+                <div class="birthdate"><?= strtoupper(date('F j, Y', strtotime($person['birthdate']))) ?></div>
+                <div class="sex"><?= strtoupper($person['sex']) ?></div>
+                <div class="date_issued"><?= strtoupper(date('F j, Y')) ?></div>
+                <div class="bloodtype"><?= $person['bloodtype'] ?></div>
+                <div class="valid"><?= $expiry_date->format('F j, Y') ?></div>
+                <div class="status">NEW</div>
+                <div class="parent"><?= $parent ?></div>
+                <div class="contactNumber"><?= $person['mobile_no'] ?? null ?></div>
 
                 <!-- Example Photo -->
-                <img src="<?= base_url($record['img'] ?? '') ?>" class="photo">
+                <!-- <img src="" class="photo"> -->
             </div>
         </div>
     </div>
 
+    <script>
+        window.onload = function() {
+            window.print();
+        };
+    </script>
 </body>
 
 </html>

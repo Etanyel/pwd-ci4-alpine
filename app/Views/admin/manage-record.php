@@ -28,56 +28,83 @@
 
                     <div class="mt-3 mb-2 border-top"></div>
 
-                    <div class="">
-                        <a href="<?= base_url('/admin/print-id/' . $record['id']) ?>" target="_blank" class="btn btn-dark">Print ID Front</a>
+                    <div class="p-2 rounded border">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="text-center fw-bold border-bottom">Action</p>
+                                <button class="btn btn-sm btn-dark" data-bs-target="#printID" data-bs-toggle="modal">Print ID</button>
+                            </div>
+                            <div class="border-start col-md-6">
+                                <p class="text-center fw-bold border-bottom">Status</p>
+                                <span class="badge text-bg-success" x-show="record.is_printed == 1">
+                                    <i class="bi bi-check2-circle me-1"></i>
+                                    <span class="" x-text="record.is_printed == 1 ? 'ID Printed' : ''">
+                                    </span>
+                                </span>
+
+                                <span class="badge text-bg-dark">
+                                    <i class="bi bi-person-fill-check me-1"></i>
+                                    Member</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
+                <div class="modal fade" id="printID">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                        <div class="modal-content">
+                            <div class="modal-body text-center d-flex gap-2">
+                                <a href="<?= base_url('/admin/print-id/' . $record['id']) ?>" target="_blank" class="btn btn-dark btn-lg">Print ID (Front)</a>
+                                <a href="<?= base_url('/admin/print-id-back/' . $record['id']) ?>" target="_blank" class="btn btn-dark btn-lg">Print ID (Back)</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-8">
                     <div class="">
-                        <h4 class="text-primary font-monospace">
+                        <h4 class="text-primary font-monospace fw-semibold">
                             Personal Information
                         </h4>
                     </div>
                     <div class="row px-3">
                         <div class="col-md-6 border border-dark">
-                            <label for="" class="form-label fw-semibold">PWD NUMBER</label>
+                            <label for="" class="form-label fw-bold">PWD NUMBER</label>
                             <p x-text="record.pwd_no"></p>
                         </div>
 
                         <div class="col-md-6 border border-dark">
-                            <label for="" class="form-label fw-semibold">DATE APPLIED</label>
-                            <p x-text="formatDate(record.date_applied)"></p>
+                            <label for="" class="form-label fw-bold">DATE APPLIED</label>
+                            <p class="text-uppercase" x-text="formatDate(record.date_applied)"></p>
                         </div>
                     </div>
                     <div class="row px-3">
                         <div class="col-md-3 border border-dark">
-                            <label for="" class="form-label fw-semibold">LAST NAME</label>
+                            <label for="" class="form-label fw-bold">LAST NAME</label>
                             <p x-text="record.lastname"></p>
                         </div>
 
                         <div class="col-md-4 border border-dark">
-                            <label for="" class="form-label fw-semibold">FIRST NAME</label>
+                            <label for="" class="form-label fw-bold">FIRST NAME</label>
                             <p x-text="record.firstname"></p>
                         </div>
                         <div class="col-md-3 border border-dark">
-                            <label for="" class="form-label fw-semibold">MIDDLE NAME</label>
+                            <label for="" class="form-label fw-bold">MIDDLE NAME</label>
                             <p x-text="record.middlename ? record.middlename : 'N/A'"></p>
                         </div>
 
                         <div class="col-md-2 border border-dark">
-                            <label for="" class="form-label fw-semibold">SUFFIX NAME</label>
+                            <label for="" class="form-label fw-bold">SUFFIX NAME</label>
                             <p x-text="record.suffix ? record.suffix : 'N/A'"></p>
                         </div>
                     </div>
                     <div class="row px-3">
                         <div class="col-md-6 border border-dark">
-                            <label for="" class="form-label fw-semibold">TYPE OF DISABILITY</label>
+                            <label for="" class="form-label fw-bold">TYPE OF DISABILITY</label>
                             <p x-text="record.disability == 'Others' ? record.other_disability : record.disability" class="text-uppercase"></p>
                         </div>
 
                         <div class="col-md-6 border border-dark">
-                            <label for="" class="form-label fw-semibold">CAUSE OF DISABILITY</label>
+                            <label for="" class="form-label fw-bold">CAUSE OF DISABILITY</label>
                             <div class="">
                                 <span x-text="cause_of.find(e => e.id == record.cause_of)?.label" class="badge text-bg-dark"></span>
                                 <p x-text="record.title == 'Others' ? record.other_cause : record.title" class="text-uppercase"></p>
@@ -86,120 +113,120 @@
                     </div>
                     <div class="row px-3">
                         <div class="col-md-2 border border-dark">
-                            <label for="" class="form-label fw-semibold">ADDRESS:</label>
+                            <label for="" class="form-label fw-bold">ADDRESS:</label>
                             <p></p>
                         </div>
                         <div class="col-md-5 border border-dark">
-                            <label for="" class="form-label fw-semibold">HOUSE NO. AND STREET NAME</label>
+                            <label for="" class="form-label fw-bold">HOUSE NO. AND STREET NAME</label>
                             <p x-text="record.street_name"></p>
                         </div>
                         <div class="col-md-5 border border-dark">
-                            <label for="" class="form-label fw-semibold">BARANGAY</label>
+                            <label for="" class="form-label fw-bold">BARANGAY</label>
                             <p x-text="record.barangay"></p>
                         </div>
                     </div>
                     <div class="row px-3">
                         <div class="col-md-5 border border-dark">
-                            <label for="" class="form-label fw-semibold">CITY/MUNICIPALITY</label>
+                            <label for="" class="form-label fw-bold">CITY/MUNICIPALITY</label>
                             <p x-text="record.city_municipality"></p>
                         </div>
                         <div class="col-md-5 border border-dark">
-                            <label for="" class="form-label fw-semibold">PROVINCE</label>
+                            <label for="" class="form-label fw-bold">PROVINCE</label>
                             <p x-text="record.province"></p>
                         </div>
                         <div class="col-md-2 border border-dark">
-                            <label for="" class="form-label fw-semibold">REGION</label>
+                            <label for="" class="form-label fw-bold">REGION</label>
                             <p x-text="record.region"></p>
                         </div>
                     </div>
                     <div class="row px-3">
-                        <p class="mb-0  border border-dark fw-semibold">CONTACT DETAILS</p>
+                        <p class="mb-0  border border-dark fw-bold">CONTACT DETAILS</p>
                     </div>
                     <div class="row px-3">
                         <div class="col-md-4 border border-dark">
                             <div class="d-flex gap-2">
-                                <p class="fw-semibold">LANDLINE: </p>
+                                <p class="fw-bold">LANDLINE: </p>
                                 <span x-text="record.landline ? record.landline : 'N/A'"></span>
                             </div>
                         </div>
                         <div class="col-md-4 border border-dark">
                             <div class="d-flex gap-2">
-                                <p class="fw-semibold">MOBILE: </p>
+                                <p class="fw-bold">MOBILE: </p>
                                 <span x-text="record.mobile_no ? record.mobile_no : 'N/A'"></span>
                             </div>
                         </div>
                         <div class="col-md-4 border border-dark">
                             <div class="d-flex gap-2">
-                                <p class="fw-semibold">EMAIL: </p>
+                                <p class="fw-bold">EMAIL: </p>
                                 <span x-text="record.email ? record.email : 'N/A'"></span>
                             </div>
                         </div>
                     </div>
                     <div class="row px-3">
                         <div class="col-md-5 border border-dark">
-                            <label for="" class="form-label fw-semibold">DATE OF BIRTH</label>
-                            <p x-text="formatDate(record.birthdate)"></p>
+                            <label for="" class="form-label fw-bold">DATE OF BIRTH</label>
+                            <p class="text-uppercase" x-text="formatDate(record.birthdate)"></p>
                         </div>
                         <div class="col-md-2 border border-dark">
-                            <label for="" class="form-label fw-semibold">SEX</label>
+                            <label for="" class="form-label fw-bold">SEX</label>
                             <p x-text="record.sex" class="text-uppercase"></p>
                         </div>
                         <div class="col-md-5 border border-dark">
-                            <label for="" class="form-label fw-semibold">CIVIL STATUS</label>
+                            <label for="" class="form-label fw-bold">CIVIL STATUS</label>
                             <p x-text="civil_status.find(e => e.id == record.civil_status)?.label"></p>
                         </div>
                     </div>
                     <div class="row px-3">
                         <div class="col-md-4 border border-dark">
-                            <label for="" class="form-label fw-semibold">EDUCATIONAL ATTAINMENT</label>
+                            <label for="" class="form-label fw-bold">EDUCATIONAL ATTAINMENT</label>
                             <p x-text="educational_attainment.find(e => e.id == record.educational_attainment)?.label"></p>
                         </div>
                         <div class="col-md-4 border border-dark p-0">
                             <div class="p-2 border-bottom border-dark">
-                                <label for="" class="form-label fw-semibold">EMPLOYMENT STATUS</label>
+                                <label for="" class="form-label fw-bold">EMPLOYMENT STATUS</label>
                                 <p x-text="employment_status.find(e => e.id == record.employment_status)?.label"></p>
                             </div>
                             <div class="border-top border-bottom border-dark p-2">
-                                <label for="" class="form-label fw-semibold">CATEGORY OF EMPLOYMENT</label>
+                                <label for="" class="form-label fw-bold">CATEGORY OF EMPLOYMENT</label>
                                 <p x-text="category_of_employment.find(e => e.id == record.category_of_employment)?.label"></p>
                             </div>
                             <div class="border-top border-bottom border-dark p-2">
-                                <label for="" class="form-label fw-semibold">NATURE OF EMPLOYMENT</label>
+                                <label for="" class="form-label fw-bold">NATURE OF EMPLOYMENT</label>
                                 <p x-text="nature_of_employment.find(e => e.id == record.nature_of_employment)?.label"></p>
                             </div>
                         </div>
                         <div class="col-md-4 border border-dark">
-                            <label for="" class="form-label fw-semibold">OCCUPATION</label>
+                            <label for="" class="form-label fw-bold">OCCUPATION</label>
                             <p x-text="record.occupation_name == 'Other' ? record.other_occupation : record.occupation_name"></p>
                         </div>
                     </div>
                     <div class="row px-3">
                         <div class="col-md-4 border border-dark">
-                            <label for="" class="form-label fw-semibold">BLOOD TYPE</label>
+                            <label for="" class="form-label fw-bold">BLOOD TYPE</label>
                             <p x-text="record.bloodtype ? record.bloodtype : 'N/A'"></p>
                         </div>
                         <div class="col-md-4 border border-dark">
-                            <label for="" class="form-label fw-semibold">ORGANIZATION AFFILIATED</label>
-                            <p>Organization Affiliated: <span x-text="record.organization_affiliated ? record.organization_affiliated : 'N/A'"></span></p>
-                            <p>Contact Person: <span x-text="record.contact_person ? record.contact_person : 'N/A'"></span></p>
-                            <p>Office Address: <span x-text="record.office_address ? record.office_address : 'N/A'"></span></p>
+                            <label for="" class="form-label fw-bold">ORGANIZATION AFFILIATED</label>
+                            <p><span class="fw-semibold">Organization Affiliated</span>: <span x-text="record.organization_affiliated ? record.organization_affiliated : 'N/A'"></span></p>
+                            <p><span class="fw-semibold">Contact Person</span>: <span x-text="record.contact_person ? record.contact_person : 'N/A'"></span></p>
+                            <p><span class="fw-semibold">Office Address</span>: <span x-text="record.office_address ? record.office_address : 'N/A'"></span></p>
                             <p></p>
                         </div>
                         <div class="col-md-4 border border-dark">
-                            <label for="" class="form-label fw-semibold">ID REFERENCE NO.</label>
-                            <p>SSS NO.: <span x-text="record.sss_no ? record.sss_no : 'N/A'"></span></p>
-                            <p>GSIS NO.: <span x-text="record.gsis_no ? record.gsis_no : 'N/A'"></span></p>
-                            <p>PHILHEALTH NO.: <span x-text="record.philhealth_no ? record.philhealth_no : 'N/A'"></span></p>
+                            <label for="" class="form-label fw-bold">ID REFERENCE NO.</label>
+                            <p><span class="fw-semibold">SSS NO.</span>: <span x-text="record.sss_no ? record.sss_no : 'N/A'"></span></p>
+                            <p><span class="fw-semibold">GSIS NO.</span>: <span x-text="record.gsis_no ? record.gsis_no : 'N/A'"></span></p>
+                            <p><span class="fw-semibold">PHILHEALTH NO.</span>: <span x-text="record.philhealth_no ? record.philhealth_no : 'N/A'"></span></p>
                         </div>
                     </div>
                     <div class="row px-3">
                         <div class="col-md-6 border border-dark">
-                            <label for="" class="form-label fw-semibold">FATHER'S NAME</label>
+                            <label for="" class="form-label fw-bold">FATHER'S NAME</label>
                             <p x-text="record.fathers_name ? record.fathers_name : 'N/A'"></p>
                         </div>
 
                         <div class="col-md-6 border border-dark">
-                            <label for="" class="form-label fw-semibold">MOTHER'S NAME</label>
+                            <label for="" class="form-label fw-bold">MOTHER'S NAME</label>
                             <p x-text="record.mothers_name ? record.mothers_name : 'N/A'"></p>
                         </div>
                     </div>
@@ -814,7 +841,7 @@
                 formData.append('id', this.id);
 
                 try {
-                    const res = await fetch('/admin/update-record/<?= $record['id'] ?>', {
+                    const res = await csrfFetch('/admin/update-record/<?= $record['id'] ?>', {
                         method: 'POST',
                         body: formData
                     });
@@ -1073,7 +1100,7 @@
                 formData.append('id', this.id);
 
                 try {
-                    const res = await fetch('<?= base_url("admin/upload-person-photo") ?>', {
+                    const res = await csrfFetch('<?= base_url("admin/upload-person-photo") ?>', {
                         method: 'POST',
                         body: formData
                     });

@@ -520,7 +520,7 @@
                 formData.append('mothers_firstname', this.form.mothers_firstname);
                 formData.append('mothers_middlename', this.form.mothers_middlename);
 
-                const res = await fetch('/admin/add-record', {
+                const res = await csrfFetch('/admin/add-record', {
                     method: 'POST',
                     body: formData
                 });

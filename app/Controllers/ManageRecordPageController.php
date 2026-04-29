@@ -16,7 +16,17 @@ class ManageRecordPageController extends BaseController
     public function fetchRecords()
     {
         try {
+            $search = $this->request->getGet('search');
             $model = new PersonsModel();
+
+            if ($search != '') {
+                $model->groupStart()
+                    ->like('lastname', $search)
+                    ->orLike('firstname', $search)
+                    ->orLike('pwd_no', $search)
+                    ->groupEnd();
+            }
+
             $records = $model->findAll();
 
             return $this->response->setJSON([
@@ -86,7 +96,8 @@ class ManageRecordPageController extends BaseController
             if (!$id) {
                 return $this->response->setJSON([
                     'status' => 'error',
-                    'errors' => 'Invalid record ID'
+                    'errors' => ['Invalid record ID'],
+                    'csrf_token' => csrf_hash()
                 ]);
             }
 
@@ -97,9 +108,42 @@ class ManageRecordPageController extends BaseController
             if (!$old) {
                 return $this->response->setJSON([
                     'status' => 'error',
-                    'errors' => 'Record not found'
+                    'errors' => ['Record not found'],
+                    'csrf_token' => csrf_hash()
                 ]);
             }
+
+            // Helper function to build parent name (only if any field has value)
+            $buildParentName = function ($firstname, $middlename, $lastname) {
+                $firstname = trim($firstname ?? '');
+                $middlename = trim($middlename ?? '');
+                $lastname = trim($lastname ?? '');
+
+                // Return null if all fields are empty (so no update occurs)
+                if (empty($firstname) && empty($middlename) && empty($lastname)) {
+                    return null;
+                }
+
+                $parts = [];
+                if (!empty($firstname)) $parts[] = strtoupper($firstname);
+                if (!empty($middlename)) $parts[] = strtoupper($middlename);
+                if (!empty($lastname)) $parts[] = strtoupper($lastname);
+
+                return implode(' ', $parts);
+            };
+
+            // Build parent names (will be null if all fields empty)
+            $fathers_name = $buildParentName(
+                $request->getPost('fathers_firstname'),
+                $request->getPost('fathers_middlename'),
+                $request->getPost('fathers_lastname')
+            );
+
+            $mothers_name = $buildParentName(
+                $request->getPost('mothers_firstname'),
+                $request->getPost('mothers_middlename'),
+                $request->getPost('mothers_lastname')
+            );
 
             // New data from request
             $data = [
@@ -131,16 +175,32 @@ class ManageRecordPageController extends BaseController
                 'occupation' => $request->getPost('occupation'),
                 'other_occupation' => $request->getPost('other_occupation'),
                 'bloodtype' => $request->getPost('bloodtype'),
-                'organization_affliated' => $request->getPost('organization_affliated'),
+                'organization_affiliated' => $request->getPost('organization_affiliated'), // Fixed spelling
                 'office_address' => $request->getPost('office_address'),
                 'contact_person' => $request->getPost('contact_person'),
                 'sss_no' => $request->getPost('sss_no'),
                 'gsis_no' => $request->getPost('gsis_no'),
                 'psn_no' => $request->getPost('psn_no'),
                 'philhealth_no' => $request->getPost('philhealth_no'),
-                'fathers_name' => strtoupper($request->getPost('fathers_firstname') . " " . ($request->getPost('fathers_middlename') != '' ? $request->getPost('fathers_middlename') : ". ") . " " . $request->getPost('fathers_lastname')),
-                'mothers_name' => strtoupper($request->getPost('mothers_firstname') . " " . ($request->getPost('mothers_middlename') != '' ? $request->getPost('mothers_middlename') :  ". ") . " " . $request->getPost('mothers_lastname')),
             ];
+
+            // Only add fathers_name if not null
+            if ($fathers_name !== null) {
+                $data['fathers_name'] = $fathers_name;
+            }
+
+            // Only add mothers_name if not null
+            if ($mothers_name !== null) {
+                $data['mothers_name'] = $mothers_name;
+            }
+
+            // Remove empty values (optional - only if you want to keep existing data)
+            // This prevents overwriting existing data with empty strings
+            foreach ($data as $key => $value) {
+                if ($value === '' || $value === null) {
+                    unset($data[$key]);
+                }
+            }
 
             // VALIDATION RULES
             $validationRules = [
@@ -156,52 +216,78 @@ class ManageRecordPageController extends BaseController
             if (!$this->validate($validationRules)) {
                 return $this->response->setJSON([
                     'status' => 'error',
-                    'errors' => $this->validator->getErrors()
+                    'errors' => $this->validator->getErrors(),
+                    'csrf_token' => csrf_hash()
                 ]);
             }
 
-            // ✅ COMPARE OLD VS NEW
+            // ✅ COMPARE OLD VS NEW (only for fields that exist in data)
             $changes = [];
 
             foreach ($data as $field => $newValue) {
                 $oldValue = $old[$field] ?? null;
 
-                // Normalize for comparison
-                if ((string)$oldValue !== (string)$newValue) {
-                    $changes[] = "$field: {$oldValue} → {$newValue}";
+                // Normalize for comparison (handle null vs empty string)
+                $oldValueNormalized = ($oldValue === null || $oldValue === '') ? null : (string)$oldValue;
+                $newValueNormalized = ($newValue === null || $newValue === '') ? null : (string)$newValue;
+
+                if ($oldValueNormalized !== $newValueNormalized) {
+                    // Format the change message nicely
+                    $oldDisplay = $oldValueNormalized ?? '[empty]';
+                    $newDisplay = $newValueNormalized ?? '[empty]';
+                    $changes[] = "$field: {$oldDisplay} → {$newDisplay}";
                 }
             }
 
-            // Update record
-            $model->update($id, $data);
-
-            // ✅ ACTIVITY LOG MESSAGE
-            $actionText = 'Updated record';
-
-            if (!empty($changes)) {
-                $actionText .= ' (' . implode(', ', $changes) . ')';
+            // If no changes, return early without updating
+            if (empty($changes)) {
+                return $this->response->setJSON([
+                    'status' => 'info',
+                    'message' => 'No changes detected',
+                    'changes' => []
+                ]);
             }
 
-            $newRec = $model->where('pwd_no', $data['pwd_no'])->first();
+            // Update record (only if there are changes)
+            if (!$model->update($id, $data)) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'errors' => $model->errors(),
+                    'csrf_token' => csrf_hash()
+                ]);
+            }
 
-            service('activitylog')->save([
-                'user_id' => session()->get('userId'),
-                'tag_id' => $newRec['id'],
-                'user_agent' => $request->getUserAgent()->getAgentString(),
-                'ip_address' => $request->getIPAddress(),
-                'action' => $actionText,
-                'tag' => 'MEMBER'
-            ]);
+            // Get updated record for activity log
+            $updatedRecord = $model->find($id);
+
+            // ✅ ACTIVITY LOG MESSAGE
+            $actionText = 'Updated record (' . implode(', ', $changes) . ')';
+
+            // Load activity log service (check if exists first)
+            if (function_exists('service') && method_exists(service('activitylog'), 'save')) {
+                service('activitylog')->save([
+                    'user_id' => session()->get('userId'),
+                    'tag_id' => $updatedRecord['id'],
+                    'user_agent' => $request->getUserAgent()->getAgentString(),
+                    'ip_address' => $request->getIPAddress(),
+                    'action' => $actionText,
+                    'tag' => 'MEMBER'
+                ]);
+            }
 
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Record updated successfully',
-                'changes' => $changes // optional (for debugging/UI)
+                'changes' => $changes,
+                'csrf_token' => csrf_hash()
             ]);
         } catch (\Throwable $e) {
+            // Log the error for debugging
+            log_message('error', '[updateRecord] Error: ' . $e->getMessage());
+
             return $this->response->setJSON([
                 'status' => 'error',
-                'errors' => $e->getMessage()
+                'errors' => ['An unexpected error occurred: ' . $e->getMessage()]
             ]);
         }
     }
@@ -264,7 +350,8 @@ class ManageRecordPageController extends BaseController
         return $this->response->setJSON([
             'status' => 'success',
             'img_url' => $imgUrl,
-            'message' => 'Profile photo updated successfully.'
+            'message' => 'Profile photo updated successfully.',
+            'csrf_token' => csrf_hash()
         ]);
     }
 
@@ -283,7 +370,61 @@ class ManageRecordPageController extends BaseController
                 return redirect()->back()->with('error', 'Record not found');
             }
 
-            return view('admin/id-print/id-back', ['record' => $record]);
+            return view('admin/id-print/id-front', ['record' => $record]);
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function printBack($id)
+    {
+        try {
+            $model = new PersonsModel();
+            $person = $model->find($id);
+
+            if (empty($person)) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'errors' => 'Person record not found.'
+                ]);
+            }
+
+            return view('admin/id-print/id-back', ['person' => $person]);
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function printLog($id)
+    {
+        try {
+            $model = new PersonsModel();
+            $person = $model->where('id', $id)->first();
+
+            if (!$person) {
+                return;
+            }
+
+            $action = $person['is_printed'] == 0 ? 'Printed ID' : 'Reprinted ID';
+
+            service('activitylog')->save([
+                'user_id' => session()->get('userId'),
+                'tag_id' => $id,
+                'user_agent' => service('request')->getUserAgent()->getAgentString(),
+                'ip_address' => service('request')->getIPAddress(),
+                'action' => $action,
+                'tag' => 'MEMBER'
+            ]);
+
+            if ($person['is_printed'] == 0) {
+                $model->update($id, ['is_printed' => 1]);
+            }
         } catch (\Throwable $e) {
             return $this->response->setJSON([
                 'status' => 'error',

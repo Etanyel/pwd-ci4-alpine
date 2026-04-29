@@ -51,7 +51,8 @@ class PersonsModel extends Model
         'fathers_name',
         'mothers_name',
         'date_applied',
-        'img'
+        'img',
+        'is_printed'
     ];
 
     protected bool $allowEmptyInserts = false;

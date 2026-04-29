@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= csrf_hash() ?>">
+    <meta name="csrf-name" content="<?= csrf_token() ?>">
     <title>PWD | Login</title>
 
     <!-- Bootstrap -->
@@ -104,7 +106,7 @@
                         formData.append('username', this.form.username.trim());
                         formData.append('password', this.form.password);
 
-                        const res = await fetch('/login', {
+                        const res = await csrfFetch('/login', {
                             method: 'POST',
                             body: formData
                         });
@@ -138,6 +140,38 @@
                 },
             }));
         });
+
+
+
+        window.csrfFetch = function(url, options = {}) {
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+            const name = document.querySelector('meta[name="csrf-name"]').content;
+
+            if (options.body instanceof FormData) {
+                options.body.append(name, token);
+            } else if (options.body && typeof options.body === 'object') {
+                options.headers = {
+                    ...(options.headers || {}),
+                    'Content-Type': 'application/json'
+                };
+
+                options.body = JSON.stringify({
+                    ...options.body,
+                    [name]: token
+                });
+            } else {
+                options.headers = {
+                    ...(options.headers || {}),
+                    'Content-Type': 'application/json'
+                };
+
+                options.body = JSON.stringify({
+                    [name]: token
+                });
+            }
+
+            return fetch(url, options);
+        };
     </script>
 </body>
 

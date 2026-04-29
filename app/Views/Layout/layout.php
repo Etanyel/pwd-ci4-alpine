@@ -4,13 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= csrf_hash() ?>">
+    <meta name="csrf-name" content="<?= csrf_token() ?>">
     <title><?= $this->renderSection('tab-title') ?? 'Dashboard' ?></title>
 
     <!-- Bootstrap -->
     <link href="<?= base_url('css/bootstrap/dist/css/bootstrap.min.css') ?>" rel="stylesheet">
 
     <!-- Bootstrap JS -->
-    <link href="<?= base_url('css\bootstrap\dist\js\bootstrap.bundle.min.js') ?>" rel="stylesheet">
+    <!-- <link href="" rel="stylesheet"> -->
 
     <!-- Icons -->
     <link href="<?= base_url('bootstrap-icons/font/bootstrap-icons.css') ?>" rel="stylesheet">
@@ -70,7 +72,9 @@
         <div>
             <!-- Brand -->
             <div class="p-3 d-flex justify-content-between align-items-center shadow mb-2">
-                <span x-show="open">PWD Management System</span>
+                <span x-show="open">
+                    <i class="bi bi-person-wheelchair"></i>
+                    PWD Management System</span>
                 <button class="btn btn-sm btn-ghost text-white" @click="open = !open">
                     <i class="bi bi-layout-sidebar"></i>
                 </button>
@@ -85,7 +89,7 @@
                         <span x-show="open"> Dashboard</span>
                     </a>
                 </li>
-                
+
                 <li class="nav-item rounded <?= $this->renderSection('manage-records-active') ?>">
                     <a href="<?= base_url('/admin/manage-records'); ?>" class="nav-link text-white">
                         <i class="bi bi-list-task"></i>
@@ -133,10 +137,44 @@
 
     </div>
 
+
     <script src="<?= base_url('sweetalert2/dist/sweetalert2.all.min.js') ?>"></script>
+    <script src="<?= base_url('css/bootstrap/dist/js/bootstrap.bundle.min.js') ?>"></script>
+
+    <script>
+        window.csrfFetch = function(url, options = {}) {
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+            const name = document.querySelector('meta[name="csrf-name"]').content;
+
+            if (options.body instanceof FormData) {
+                options.body.append(name, token);
+            } else if (options.body && typeof options.body === 'object') {
+                options.headers = {
+                    ...(options.headers || {}),
+                    'Content-Type': 'application/json'
+                };
+
+                options.body = JSON.stringify({
+                    ...options.body,
+                    [name]: token
+                });
+            } else {
+                options.headers = {
+                    ...(options.headers || {}),
+                    'Content-Type': 'application/json'
+                };
+
+                options.body = JSON.stringify({
+                    [name]: token
+                });
+            }
+
+            return fetch(url, options);
+        };
+    </script>
+
     <!-- Scripts -->
     <?= $this->renderSection('scripts') ?>
-
 
 </body>
 
