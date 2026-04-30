@@ -11,69 +11,76 @@ class AuthController extends BaseController
 {
     public function login()
     {
-        $model = new UserModel();
-        $username = $this->request->getPost('username');
-        $password = $this->request->getPost('password');
+        try {
+            $model = new UserModel();
+            $username = $this->request->getPost('username');
+            $password = $this->request->getPost('password');
 
-        $validation = Services::validation();
+            $validation = Services::validation();
 
-        $validation->setRules([
-            'username' => 'required|max_length[50]|min_length[3]',
-            'password' => 'required|max_length[50]|min_length[6]',
-        ]);
-
-        if (!$validation->withRequest($this->request)->run()) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'errors' => $validation->getErrors()
+            $validation->setRules([
+                'username' => 'required|max_length[50]|min_length[3]',
+                'password' => 'required|max_length[50]|min_length[6]',
             ]);
-        }
 
-        $user = $model->where('username', $username)->first();
-
-        if ($user && password_verify($password, $user['password'])) {
-            if ($user['isActive'] == 1) {
-                $session = session();
-
-                service('activitylog')->save([
-                    'user_id' => $user['id'],
-                    'tag_id' => null,
-                    'user_agent' => service('request')->getUserAgent()->getAgentString(),
-                    'ip_address' => service('request')->getIPAddress(),
-                    'action' => 'Logged In',
-                    'tag' => 'AUTH'
-                ]);
-
-                $session->set([
-                    'userRole' => $user['role'],
-                    'userId' => $user['id'],
-                    'user_firstname' => $user['firstname'],
-                    'user_lastname' => $user['lastname'],
-                    'user_img' => $user['img'],
-                    'isLoggedIn' => true,
-                ]);
-
-                $session->regenerate();
-
+            if (!$validation->withRequest($this->request)->run()) {
                 return $this->response->setJSON([
-                    'status' => 'success',
-                    'role' => $user['role'],
+                    'status' => 'error',
+                    'errors' => $validation->getErrors()
                 ]);
+            }
+
+            $user = $model->where('username', $username)->first();
+
+            if ($user && password_verify($password, $user['password'])) {
+                if ($user['isActive'] == 1) {
+                    $session = session();
+
+                    service('activitylog')->save([
+                        'user_id' => $user['id'],
+                        'tag_id' => null,
+                        'user_agent' => service('request')->getUserAgent()->getAgentString(),
+                        'ip_address' => service('request')->getIPAddress(),
+                        'action' => 'Logged In',
+                        'tag' => 'AUTH'
+                    ]);
+
+                    $session->set([
+                        'userRole' => $user['role'],
+                        'userId' => $user['id'],
+                        'user_firstname' => $user['firstname'],
+                        'user_lastname' => $user['lastname'],
+                        'user_img' => $user['img'],
+                        'isLoggedIn' => true,
+                    ]);
+
+                    $session->regenerate();
+
+                    return $this->response->setJSON([
+                        'status' => 'success',
+                        'role' => $user['role'],
+                    ]);
+                } else {
+                    return $this->response->setJSON([
+                        'status' => 'error',
+                        'errors' => [
+                            'username' => 'This account is inactive. Please contact the administrator.'
+                        ]
+                    ]);
+                }
             } else {
                 return $this->response->setJSON([
                     'status' => 'error',
                     'errors' => [
-                        'username' => 'This account is inactive. Please contact the administrator.'
+                        'username' => 'Invalid Credentials.',
+                        'password' => 'Invalid Credentials.'
                     ]
                 ]);
             }
-        } else {
+        } catch (\Throwable $e) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'errors' => [
-                    'username' => 'Invalid Credentials.',
-                    'password' => 'Invalid Credentials.'
-                ]
+                'errors' => $e->getMessage()
             ]);
         }
     }
