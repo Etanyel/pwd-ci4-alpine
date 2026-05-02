@@ -357,7 +357,7 @@
                                     <option :value="r.code" x-text="r.region_name"></option>
                                 </template>
                             </select>
-                            <p class="text-danger fw-semibold" x-text="errors.region"></p>
+                            <p :class="errors.region ? 'text-danger fw-semibold' : 'fw-semibold'" x-text="errors.region ? errors.region : 'Current Region: ' + record.region"></p>
                         </div>
 
                         <!-- PROVINCE -->
@@ -369,7 +369,7 @@
                                     <option :value="p.code" x-text="p.name"></option>
                                 </template>
                             </select>
-                            <p class="text-danger fw-semibold" x-text="errors.province"></p>
+                            <p :class="errors.province ? 'text-danger fw-semibold' : 'fw-semibold'" x-text="errors.province ? errors.province : 'Current Province: ' + record.province"></p>
                         </div>
 
                         <!-- CITY -->
@@ -381,7 +381,7 @@
                                     <option :value="c.code" x-text="c.name"></option>
                                 </template>
                             </select>
-                            <p class="text-danger fw-semibold" x-text="errors.city"></p>
+                            <p :class="errors.city_municipality ? 'text-danger fw-semibold' : 'fw-semibold'" x-text="errors.city_municipality ? errors.city_municipality : 'Current City: ' + record.city_municipality"></p>
                         </div>
 
                         <!-- BARANGAY -->
@@ -600,7 +600,7 @@
 
                 <div class="mb-2">
                     <label for="" class="form-label fw-semibold">17. FAMILY BACKGROUND</label>
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <label class="form-label fw-semibold">FATHER'S NAME</label>
                         <div class="row">
                             <div class="col-md-4">
@@ -616,7 +616,9 @@
                                 <input type="text" class="form-control" x-model="form.fathers_middlename">
                             </div>
                         </div>
+                        <span class="fw-semibold">Current Father's Name: </span><span x-text="record.fathers_name == null ? 'N/A' : record.fathers_name">
                     </div>
+                    <hr>
                     <div class="mb-2">
                         <label class="form-label fw-semibold">MOTHER'S NAME</label>
                         <div class="row">
@@ -633,6 +635,7 @@
                                 <input type="text" class="form-control" x-model="form.mothers_middlename">
                             </div>
                         </div>
+                        <span class="fw-semibold">Current Mother's Name: </span><span x-text="record.mothers_name == null ? 'N/A' : record.mothers_name">
                     </div>
                 </div>
 
@@ -847,6 +850,7 @@
                     });
 
                     const data = await res.json();
+                    updateCSRF(data.csrf_token, data.csrf_name); // Update CSRF token
 
                     if (data.status === 'error') {
                         this.errors = data.errors;
@@ -1106,6 +1110,7 @@
                     });
 
                     const data = await res.json();
+                    updateCSRF(data.csrf_token, data.csrf_name); // Update CSRF token
 
                     if (data.status === 'success') {
                         await Swal.fire('Success', 'Profile photo updated!', 'success');

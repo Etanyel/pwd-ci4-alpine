@@ -188,7 +188,7 @@
                     <!-- mobile number -->
                     <div class="col-4">
                         <label for="" class="form-label fw-semibold">MOBILE NUMBER</label>
-                        <input type="text" class="form-control" :class="errors.mobile_no ? 'border-danger' : ''" x-model="form.mobile_no" placeholder="09123456789">
+                        <input type="text" maxlength="11" class="form-control" :class="errors.mobile_no ? 'border-danger' : ''" x-model="form.mobile_no" placeholder="09123456789">
                     </div>
 
                     <!-- Email Address -->
@@ -526,6 +526,7 @@
                 });
 
                 const data = await res.json();
+                updateCSRF(data.csrfToken, data.csrfName); // update CSRF token and CSRF Name after every request
 
                 if (data.status === 'error') {
                     this.errors = data.errors;

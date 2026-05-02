@@ -17,11 +17,26 @@ class AddRecordPageController extends BaseController
 {
     public function index()
     {
+        if (!session()->get('userId')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized access.'
+            ])->setStatusCode(403);
+        }
+
         return view('admin/add-record');
     }
 
     public function fetchCause($num)
     {
+        if (!session()->get('userId')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized access.'
+            ])->setStatusCode(403);
+        }
+
+
         $model = new CauseOfDisability;
 
         // if ($num > 2) {
@@ -40,6 +55,13 @@ class AddRecordPageController extends BaseController
     public function fetchDisability()
     {
         try {
+            if (!session()->get('userId')) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ])->setStatusCode(403);
+            }
+
             $model = new DisabilityType;
 
             return $this->response->setJSON([
@@ -57,6 +79,13 @@ class AddRecordPageController extends BaseController
     public function fetchOccupation()
     {
         try {
+            if (!session()->get('userId')) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ])->setStatusCode(403);
+            }
+
             $model = db_connect()->table('person_occupation');
             $occupation = $model->get()->getResultArray();
 
@@ -78,6 +107,13 @@ class AddRecordPageController extends BaseController
     public function addRecord()
     {
         try {
+            if (!session()->get('userId')) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ])->setStatusCode(403);
+            }
+
             $model = new PersonsModel();
             $regionModel = new RegionModel();
             $provinceModel = new ProvinceModel();
@@ -99,6 +135,8 @@ class AddRecordPageController extends BaseController
                 return $this->response->setJSON([
                     'status' => 'error',
                     'errors' => 'Invalid region, province, city, or barangay selected.',
+                    'csrf_token' => csrf_hash(),
+                    'csrf_name' => csrf_token()
                 ]);
             }
 
@@ -321,6 +359,8 @@ class AddRecordPageController extends BaseController
                 return $this->response->setJSON([
                     'status' => 'error',
                     'errors' => $validation->getErrors(),
+                    'csrf_token' => csrf_hash(),
+                    'csrf_name' => csrf_token()
                 ]);
             }
             // remove null / empty (optional but clean)
@@ -340,13 +380,17 @@ class AddRecordPageController extends BaseController
 
             return $this->response->setJSON([
                 'status' => 'success',
-                'message' => 'New Record added Successfully.'
+                'message' => 'New Record added Successfully.',
+                'csrf_token' => csrf_hash(),
+                'csrf_name' => csrf_token()
             ]);
         } catch (\Throwable $e) {
 
             return $this->response->setJSON([
                 'status' => 'error',
                 'errors' => $e->getMessage(),
+                'csrf_token' => csrf_hash(),
+                'csrf_name' => csrf_token()
             ]);
         }
     }

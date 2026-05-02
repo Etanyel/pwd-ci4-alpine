@@ -26,7 +26,9 @@ class AuthController extends BaseController
             if (!$validation->withRequest($this->request)->run()) {
                 return $this->response->setJSON([
                     'status' => 'error',
-                    'errors' => $validation->getErrors()
+                    'errors' => $validation->getErrors(),
+                    'csrf_token' => csrf_hash(),
+                    'csrf_name' => csrf_token()
                 ]);
             }
 
@@ -59,13 +61,17 @@ class AuthController extends BaseController
                     return $this->response->setJSON([
                         'status' => 'success',
                         'role' => $user['role'],
+                        'csrf_token' => csrf_hash(),
+                        'csrf_name' => csrf_token()
                     ]);
                 } else {
                     return $this->response->setJSON([
                         'status' => 'error',
                         'errors' => [
-                            'username' => 'This account is inactive. Please contact the administrator.'
-                        ]
+                            'username' => 'This account is inactive. Please contact the administrator to verify your account.'
+                        ],
+                        'csrf_token' => csrf_hash(),
+                        'csrf_name' => csrf_token()
                     ]);
                 }
             } else {
@@ -74,19 +80,30 @@ class AuthController extends BaseController
                     'errors' => [
                         'username' => 'Invalid Credentials.',
                         'password' => 'Invalid Credentials.'
-                    ]
+                    ],
+                    'csrf_token' => csrf_hash(),
+                    'csrf_name' => csrf_token()
                 ]);
             }
         } catch (\Throwable $e) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'errors' => $e->getMessage()
+                'errors' => $e->getMessage(),
+                'csrf_token' => csrf_hash(),
+                'csrf_name' => csrf_token()
             ]);
         }
     }
 
     public function logout()
     {
+        if (!session()->get('userId')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized access.'
+            ])->setStatusCode(403);
+        }
+
         service('activitylog')->save([
             'user_id' => session()->get('userId'),
             'tag_id' => null,

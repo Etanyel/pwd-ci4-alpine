@@ -85,87 +85,34 @@
 
     <script src="<?= base_url('sweetalert2/dist/sweetalert2.all.min.js') ?>"></script>
     <script>
-        // CSRF Token helper functions
-        const csrfConfig = {
-            getToken: () => document.querySelector('meta[name="csrf-token"]')?.content,
-            getName: () => document.querySelector('meta[name="csrf-name"]')?.content,
-            getHeader: () => document.querySelector('meta[name="csrf-header"]')?.content || 'X-CSRF-TOKEN'
-        };
+        // Simple CSRF helpers
+        function getCSRF() {
+            return {
+                token: document.querySelector('meta[name="csrf-token"]').content,
+                name: document.querySelector('meta[name="csrf-name"]').content
+            };
+        }
 
-        // Improved csrfFetch function
-        window.csrfFetch = async function(url, options = {}) {
-            const token = csrfConfig.getToken();
-            const tokenName = csrfConfig.getName();
-
-            if (!token || !tokenName) {
-                console.error('CSRF tokens not found');
-                throw new Error('CSRF tokens not configured');
+        function updateCSRF(data) {
+            if (data.csrf_token && data.csrf_name) {
+                document.querySelector('meta[name="csrf-token"]').content = data.csrf_token;
+                document.querySelector('meta[name="csrf-name"]').content = data.csrf_name;
             }
+        }
 
-            // Initialize headers
-            options.headers = options.headers || {};
+        // Minimal fetch with CSRF
+        async function csrfFetch(url, formData) {
+            const {token, name} = getCSRF();
 
-            // Set CSRF header (common practice for AJAX requests)
-            options.headers['X-CSRF-TOKEN'] = token;
-            options.headers['X-Requested-With'] = 'XMLHttpRequest';
+            formData.append(name, token);
 
-            // Handle different request body types
-            if (options.body instanceof FormData) {
-                // For FormData, append the CSRF token as a field
-                options.body.append(tokenName, token);
-            } else if (options.body && typeof options.body === 'object') {
-                // For JSON, add CSRF token to the body
-                options.headers['Content-Type'] = 'application/json';
-                const bodyObj = typeof options.body === 'object' ? {
-                    ...options.body
-                } : {};
-                bodyObj[tokenName] = token;
-                options.body = JSON.stringify(bodyObj);
-            } else if (!options.body) {
-                // If no body, create one with just the CSRF token
-                options.headers['Content-Type'] = 'application/json';
-                options.body = JSON.stringify({
-                    [tokenName]: token
-                });
-            }
-
-            // Make the request
-            const response = await fetch(url, options);
-
-            // If response is unauthorized (419), refresh CSRF token
-            if (response.status === 419) {
-                await refreshCSRFToken();
-                // Retry the request with new token
-                return csrfFetch(url, options);
-            }
-
-            return response;
-        };
-
-        // Function to refresh CSRF token
-        async function refreshCSRFToken() {
-            try {
-                const response = await fetch('/refresh-csrf', {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.csrf_token && data.csrf_name) {
-                        // Update meta tags
-                        document.querySelector('meta[name="csrf-token"]').content = data.csrf_token;
-                        document.querySelector('meta[name="csrf-name"]').content = data.csrf_name;
-                        return true;
-                    }
+            return fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
-                throw new Error('Failed to refresh CSRF token');
-            } catch (error) {
-                console.error('CSRF refresh failed:', error);
-                return false;
-            }
+            });
         }
 
         document.addEventListener('alpine:init', () => {
@@ -180,117 +127,65 @@
                 },
 
                 async login() {
+                    this.errors = {};
+                    this.loading = true;
+
+                    if (!this.validateForm()) {
+                        this.loading = false;
+                        return;
+                    }
+
                     try {
-                        // Reset errors
-                        this.errors = {};
-                        this.loading = true;
-
-                        // Validate form
-                        if (!this.validateForm()) {
-                            this.loading = false;
-                            return;
-                        }
-
                         const formData = new FormData();
                         formData.append('username', this.form.username.trim());
                         formData.append('password', this.form.password);
 
-                        const response = await csrfFetch('<?= base_url('login') ?>', {
-                            method: 'POST',
-                            body: formData,
-                            credentials: 'same-origin'
-                        });
-
+                        const response = await csrfFetch('<?= base_url('login') ?>', formData);
                         const data = await response.json();
 
-                        if (!response.ok) {
-                            if (response.status === 422) {
-                                this.errors = data.errors || {};
-                                Swal.fire('Validation Error', 'Please check your input.', 'warning');
-                            } else if (response.status === 401) {
-                                Swal.fire('Login Failed', data.message || 'Invalid username or password', 'error');
-                            } else {
-                                throw new Error(data.message || 'Login failed');
-                            }
+                        // ✅ Always update CSRF token
+                        updateCSRF(data);
+
+                        if (data.status === 'error') {
+                            this.errors = data.errors || {};
                             this.loading = false;
                             return;
                         }
 
                         if (data.status === 'success') {
-                            // Store user info if needed
-                            if (data.user) {
-                                sessionStorage.setItem('user', JSON.stringify(data.user));
-                            }
-
-                            // Show success message
-                            await Swal.fire({
-                                icon: 'success',
-                                title: 'Login Successful!',
-                                text: 'Redirecting to dashboard...',
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
-
-                            // Redirect based on role
                             if (data.role === 'admin') {
                                 window.location.href = '<?= base_url('admin/pdao') ?>';
                             } else if (data.role === 'user') {
                                 window.location.href = '<?= base_url('pdao') ?>';
                             } else {
-                                window.location.href = '<?= base_url('dashboard') ?>';
+                                Swal.fire('Not Authorized', 'Invalid User!', 'error');
+                                this.loading = false;
                             }
-                        } else {
-                            this.errors = data.errors || {};
-                            Swal.fire('Login Failed', data.message || 'Invalid credentials', 'error');
-                            this.loading = false;
                         }
+
                     } catch (err) {
-                        console.error('Login error:', err);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Connection Error',
-                            text: 'Unable to connect to the server. Please check your internet connection and try again.',
-                            confirmButtonText: 'OK'
-                        });
+                        console.error(err);
+                        Swal.fire('Error', 'Something went wrong.', 'error');
                         this.loading = false;
                     }
                 },
 
                 validateForm() {
-                    let isValid = true;
+                    let valid = true;
 
                     if (!this.form.username.trim()) {
                         this.errors.username = 'Username is required';
-                        isValid = false;
+                        valid = false;
                     }
 
                     if (!this.form.password) {
                         this.errors.password = 'Password is required';
-                        isValid = false;
+                        valid = false;
                     }
 
-                    return isValid;
-                },
-
-                resetForm() {
-                    this.form.username = '';
-                    this.form.password = '';
-                    this.errors = {};
-                },
-            }));
-        });
-
-        // Optional: Handle Enter key press globally
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const loginForm = document.querySelector('[x-data="loginApp()"]');
-                if (loginForm && loginForm.__x) {
-                    const app = loginForm.__x.$data;
-                    if (!app.loading) {
-                        app.login();
-                    }
+                    return valid;
                 }
-            }
+            }));
         });
     </script>
 </body>

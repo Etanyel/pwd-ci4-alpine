@@ -16,6 +16,13 @@ class ShowUserPageController extends BaseController
 
     public function fetchUser($id)
     {
+        if (!session()->get('userId')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized access.'
+            ])->setStatusCode(403);
+        }
+
         $model = new UserModel();
 
         $user = $model->find($id);
@@ -32,9 +39,16 @@ class ShowUserPageController extends BaseController
 
     public function fetchUserProfile($id)
     {
+        if (!session()->get('userId')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized access.'
+            ])->setStatusCode(403);
+        }
+
         $model = new UserModel();
 
-        $user = $model->find($id);
+        $user = $model->select('id, firstname, lastname, middlename, suffix, age, sex, username, img, role, isActive')->find($id);
 
         if (!$user) {
             return $this->response->setJSON([
@@ -51,6 +65,13 @@ class ShowUserPageController extends BaseController
 
     public function changePass()
     {
+        if (!session()->get('userId')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized access.'
+            ])->setStatusCode(403);
+        }
+
         $model = new UserModel();
 
         $old_pass = $this->request->getPost('old_pass');
@@ -120,6 +141,13 @@ class ShowUserPageController extends BaseController
 
     public function uploadPhoto()
     {
+        if (!session()->get('userId')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized access.'
+            ])->setStatusCode(403);
+        }
+
         $model = new UserModel();
         $id = $this->request->getPost('id');
         $img = $this->request->getFile('img');
@@ -173,6 +201,13 @@ class ShowUserPageController extends BaseController
 
     public function updateInfo()
     {
+        if (!session()->get('userId')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized access.'
+            ])->setStatusCode(403);
+        }
+
         $model = new UserModel();
 
         // Get POST data

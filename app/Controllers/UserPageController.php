@@ -15,9 +15,16 @@ class UserPageController extends BaseController
 
     public function fetchUsers()
     {
+        if (!session()->get('userId')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized access.'
+            ])->setStatusCode(403);
+        }
+
         $model = new UserModel();
 
-        $data = $model->findAll();
+        $data = $model->select('id, firstname, lastname, middlename, username, isActive, role, created_at')->findAll();
 
         return $this->response->setJSON([
             'status' => 'success',

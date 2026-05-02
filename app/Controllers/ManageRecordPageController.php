@@ -16,6 +16,13 @@ class ManageRecordPageController extends BaseController
     public function fetchRecords()
     {
         try {
+            if (!session()->get('userId')) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ])->setStatusCode(403);
+            }
+
             $search = $this->request->getGet('search');
             $model = new PersonsModel();
 
@@ -61,6 +68,13 @@ class ManageRecordPageController extends BaseController
     public function fetchRecord($id)
     {
         try {
+            if (!session()->get('userId')) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ])->setStatusCode(403);
+            }
+
             $model = new PersonsModel();
             $record = $model->select('persons.*, person_disability.disability, cause_of_disability.title, person_occupation.occupation_name')
                 ->join('person_disability', 'person_disability.disability_id = persons.type_of_disability')
@@ -91,13 +105,21 @@ class ManageRecordPageController extends BaseController
     public function updateRecord($id = null)
     {
         try {
+            if (!session()->get('userId')) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ])->setStatusCode(403);
+            }
+
             $request = service('request');
 
             if (!$id) {
                 return $this->response->setJSON([
                     'status' => 'error',
                     'errors' => ['Invalid record ID'],
-                    'csrf_token' => csrf_hash()
+                    'csrf_token' => csrf_hash(),
+                    'csrf_name' => csrf_token()
                 ]);
             }
 
@@ -109,7 +131,8 @@ class ManageRecordPageController extends BaseController
                 return $this->response->setJSON([
                     'status' => 'error',
                     'errors' => ['Record not found'],
-                    'csrf_token' => csrf_hash()
+                    'csrf_token' => csrf_hash(),
+                    'csrf_name' => csrf_token()
                 ]);
             }
 
@@ -244,7 +267,9 @@ class ManageRecordPageController extends BaseController
                 return $this->response->setJSON([
                     'status' => 'info',
                     'message' => 'No changes detected',
-                    'changes' => []
+                    'changes' => [],
+                    'csrf_token' => csrf_hash(),
+                    'csrf_name' => csrf_token()
                 ]);
             }
 
@@ -253,7 +278,8 @@ class ManageRecordPageController extends BaseController
                 return $this->response->setJSON([
                     'status' => 'error',
                     'errors' => $model->errors(),
-                    'csrf_token' => csrf_hash()
+                    'csrf_token' => csrf_hash(),
+                    'csrf_name' => csrf_token()
                 ]);
             }
 
@@ -279,7 +305,8 @@ class ManageRecordPageController extends BaseController
                 'status' => 'success',
                 'message' => 'Record updated successfully',
                 'changes' => $changes,
-                'csrf_token' => csrf_hash()
+                'csrf_token' => csrf_hash(),
+                'csrf_name' => csrf_token()
             ]);
         } catch (\Throwable $e) {
             // Log the error for debugging
@@ -287,13 +314,22 @@ class ManageRecordPageController extends BaseController
 
             return $this->response->setJSON([
                 'status' => 'error',
-                'errors' => ['An unexpected error occurred: ' . $e->getMessage()]
+                'errors' => ['An unexpected error occurred: ' . $e->getMessage()],
+                'csrf_token' => csrf_hash(),
+                'csrf_name' => csrf_token()
             ]);
         }
     }
 
     public function uploadPhoto()
     {
+        if (!session()->get('userId')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized access.'
+            ])->setStatusCode(403);
+        }
+
         $model = new PersonsModel();
         $id = $this->request->getPost('id');
         $img = $this->request->getFile('img');
@@ -303,7 +339,9 @@ class ManageRecordPageController extends BaseController
         if (!$user) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'User not found.'
+                'message' => 'User not found.',
+                'csrf_token' => csrf_hash(),
+                'csrf_name' => csrf_token()
             ]);
         }
 
@@ -311,14 +349,18 @@ class ManageRecordPageController extends BaseController
         if (!$img->isValid()) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'No file uploaded or invalid file.'
+                'message' => 'No file uploaded or invalid file.',
+                'csrf_token' => csrf_hash(),
+                'csrf_name' => csrf_token()
             ]);
         }
 
         if (!in_array($img->getExtension(), ['jpg', 'jpeg', 'png', 'gif'])) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Invalid file type. Only JPG, PNG, GIF allowed.'
+                'message' => 'Invalid file type. Only JPG, PNG, GIF allowed.',
+                'csrf_token' => csrf_hash(),
+                'csrf_name' => csrf_token()
             ]);
         }
 
@@ -351,7 +393,8 @@ class ManageRecordPageController extends BaseController
             'status' => 'success',
             'img_url' => $imgUrl,
             'message' => 'Profile photo updated successfully.',
-            'csrf_token' => csrf_hash()
+            'csrf_token' => csrf_hash(),
+            'csrf_name' => csrf_token()
         ]);
     }
 
@@ -359,6 +402,13 @@ class ManageRecordPageController extends BaseController
     public function printId($id)
     {
         try {
+            if (!session()->get('userId')) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ])->setStatusCode(403);
+            }
+
             $model = new PersonsModel();
             $record = $model->select('persons.*, person_disability.disability, cause_of_disability.title, person_occupation.occupation_name')
                 ->join('person_disability', 'person_disability.disability_id = persons.type_of_disability')
@@ -382,6 +432,13 @@ class ManageRecordPageController extends BaseController
     public function printBack($id)
     {
         try {
+            if (!session()->get('userId')) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ])->setStatusCode(403);
+            }
+
             $model = new PersonsModel();
             $person = $model->find($id);
 

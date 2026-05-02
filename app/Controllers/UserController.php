@@ -16,6 +16,13 @@ class UserController extends BaseController
 
     public function registerUser()
     {
+        if (!session()->get('userId')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized access.'
+            ])->setStatusCode(403);
+        }
+
         $model = new UserModel();
 
         $img = $this->request->getFile('img');
@@ -56,6 +63,8 @@ class UserController extends BaseController
             return $this->response->setJSON([
                 'status' => 'error',
                 'errors' => $validation->getErrors(),
+                'csrf_token' => csrf_hash(),
+                'csrf_name' => csrf_token()
             ]);
         }
 
@@ -67,12 +76,16 @@ class UserController extends BaseController
             return $this->response->setJSON([
                 'status' => 'error',
                 'errors' => 'Failed to the user.',
+                'csrf_token' => csrf_hash(),
+                'csrf_name' => csrf_token()
             ]);
         }
 
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'User added.',
+            'csrf_token' => csrf_hash(),
+            'csrf_name' => csrf_token()
         ]);
     }
 }

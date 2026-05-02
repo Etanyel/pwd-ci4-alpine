@@ -25,11 +25,11 @@
     </div>
 
     <div class="card shadow-sm mt-3 p-3 border-0">
-        <div class="">
+        <!-- <div class="">
             <h4 class="text-primary">
                 PWD Records
             </h4>
-        </div>
+        </div> -->
 
         <table class="table table-hover">
             <thead>

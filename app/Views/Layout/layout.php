@@ -93,7 +93,7 @@
                 <li class="nav-item rounded <?= $this->renderSection('manage-records-active') ?>">
                     <a href="<?= base_url('/admin/manage-records'); ?>" class="nav-link text-white">
                         <i class="bi bi-list-task"></i>
-                        <span x-show="open">Manage Records</span>
+                        <span x-show="open">View Records</span>
                     </a>
                 </li>
 
@@ -108,6 +108,13 @@
                     <a href="<?= base_url('/admin/manage-users'); ?>" class="nav-link text-white">
                         <i class="bi bi-people"></i>
                         <span x-show="open">Manage Users</span>
+                    </a>
+                </li>
+
+                <li class="nav-item rounded <?= $this->renderSection('export-records-active') ?>">
+                    <a href="<?= base_url('/admin/export-records'); ?>" class="nav-link text-white">
+                        <i class="bi bi-file-earmark-excel"></i>
+                        <span x-show="open">Export Records</span>
                     </a>
                 </li>
 
@@ -142,34 +149,39 @@
     <script src="<?= base_url('css/bootstrap/dist/js/bootstrap.bundle.min.js') ?>"></script>
 
     <script>
-        window.csrfFetch = function(url, options = {}) {
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            const name = document.querySelector('meta[name="csrf-name"]').content;
+        // Simple CSRF helpers
+        function getCSRF() {
+            return {
+                token: document.querySelector('meta[name="csrf-token"]').content,
+                name: document.querySelector('meta[name="csrf-name"]').content
+            };
+        }
+
+        window.updateCSRF = function (csrf_token, csrf_name) {
+            if (csrf_token && csrf_name) {
+                document.querySelector('meta[name="csrf-token"]').content = csrf_token;
+                document.querySelector('meta[name="csrf-name"]').content = csrf_name;
+            }
+        }
+
+        // Minimal fetch with CSRF
+        window.csrfFetch = async function(url, options = {}) {
+            const {
+                token,
+                name
+            } = getCSRF();
 
             if (options.body instanceof FormData) {
                 options.body.append(name, token);
-            } else if (options.body && typeof options.body === 'object') {
-                options.headers = {
-                    ...(options.headers || {}),
-                    'Content-Type': 'application/json'
-                };
-
-                options.body = JSON.stringify({
-                    ...options.body,
-                    [name]: token
-                });
-            } else {
-                options.headers = {
-                    ...(options.headers || {}),
-                    'Content-Type': 'application/json'
-                };
-
-                options.body = JSON.stringify({
-                    [name]: token
-                });
             }
 
-            return fetch(url, options);
+            return fetch(url, {
+                ...options,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    ...(options.headers || {})
+                }
+            });
         };
     </script>
 
