@@ -55,8 +55,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->post('/admin/upload-user-photo', 'ShowUserPageController::uploadPhoto'); //update user profile photo
         $routes->post('/admin/user-update-info/', 'ShowUserPageController::updateInfo'); //update user personal info
 
-
         $routes->get('/admin/export-records', 'ExportRecordPage::index'); //Export Records Page
+
+        $routes->get('/admin/export-records/download', 'Exports::exportRecords'); //Export Record
+        $routes->get('/admin/export-records/month/(:any)', 'Exports::exportRecordsByMonth/$1'); //Export Record
     });
 
     // User

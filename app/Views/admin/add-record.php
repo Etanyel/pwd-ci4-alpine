@@ -526,7 +526,7 @@
                 });
 
                 const data = await res.json();
-                updateCSRF(data.csrfToken, data.csrfName); // update CSRF token and CSRF Name after every request
+                updateCSRF(data.csrf_token, data.csrf_name); // update CSRF token and CSRF Name after every request
 
                 if (data.status === 'error') {
                     this.errors = data.errors;

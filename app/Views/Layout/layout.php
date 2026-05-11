@@ -17,6 +17,20 @@
     <!-- Icons -->
     <link href="<?= base_url('bootstrap-icons/font/bootstrap-icons.css') ?>" rel="stylesheet">
 
+
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script> -->
+
+    <link rel="stylesheet" href="<?= base_url('vendor/flatpickr.min.css') ?>">
+
+    <link rel="stylesheet" href="<?= base_url('vendor/plugins/monthSelect/style.css') ?>">
+
+    <script src="<?= base_url('vendor/flatpickr.min.js') ?>"></script>
+
+    <script src="<?= base_url('vendor/plugins/monthSelect/index.js') ?>"></script>
+
     <!-- Alpine -->
     <script defer src="<?= base_url('js/alpinejs/dist/cdn.min.js') ?>"></script>
 
@@ -135,9 +149,18 @@
     <div :class="open ? 'content normal p-2' : 'content expanded p-2'">
 
         <!-- Top Navbar -->
-        <nav class="navbar navbar-white bg-white rounded shadow-sm mb-2 p-4">
-            <span class="navbar-brand mb-0 h5"><?= $this->renderSection('nav-title') ?></span>
-        </nav>
+        <?php
+
+        $currentUrl = current_url();
+
+        if (!str_contains($currentUrl, '/admin/export-records')):
+        ?>
+            <nav class="navbar navbar-white bg-white rounded shadow-sm mb-2 p-4">
+                <span class="navbar-brand mb-0 h5">
+                    <?= $this->renderSection('nav-title') ?>
+                </span>
+            </nav>
+        <?php endif; ?>
 
         <!-- Page Content -->
         <?= $this->renderSection('content') ?>
@@ -157,7 +180,7 @@
             };
         }
 
-        window.updateCSRF = function (csrf_token, csrf_name) {
+        window.updateCSRF = function(csrf_token, csrf_name) {
             if (csrf_token && csrf_name) {
                 document.querySelector('meta[name="csrf-token"]').content = csrf_token;
                 document.querySelector('meta[name="csrf-name"]').content = csrf_name;
