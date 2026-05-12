@@ -75,6 +75,9 @@
         }
     </style>
 </head>
+<?php
+$role = session()->get('userRole');
+?>
 
 <body x-data="{ open: true }" class="bg-light">
 
@@ -98,39 +101,41 @@
             <ul class="nav flex-column px-2 gap-2">
 
                 <li class="nav-item rounded <?= $this->renderSection('dashboard-active') ?>">
-                    <a href="<?= base_url('/admin/pdao'); ?>" class="nav-link text-white">
+                    <a href="<?= $role === 'admin' ? base_url('/admin/pdao') : base_url('/pdao') ?>" class="nav-link text-white">
                         <i class="bi bi-speedometer2"></i>
                         <span x-show="open"> Dashboard</span>
                     </a>
                 </li>
 
                 <li class="nav-item rounded <?= $this->renderSection('manage-records-active') ?>">
-                    <a href="<?= base_url('/admin/manage-records'); ?>" class="nav-link text-white">
+                    <a href="<?= $role === 'admin' ? base_url('/admin/manage-records') : base_url('/manage-records') ?>" class="nav-link text-white">
                         <i class="bi bi-list-task"></i>
                         <span x-show="open">View Records</span>
                     </a>
                 </li>
 
                 <li class="nav-item rounded <?= $this->renderSection('add-record-active') ?>">
-                    <a href="<?= base_url('/admin/add-record'); ?>" class="nav-link text-white">
+                    <a href="<?= $role === 'admin' ? base_url('/admin/add-record') : base_url('/add-record') ?>" class="nav-link text-white">
                         <i class="bi bi-list-check"></i>
                         <span x-show="open">Add Record</span>
                     </a>
                 </li>
 
-                <li class="nav-item rounded <?= $this->renderSection('manage-user-active') ?>">
-                    <a href="<?= base_url('/admin/manage-users'); ?>" class="nav-link text-white">
-                        <i class="bi bi-people"></i>
-                        <span x-show="open">Manage Users</span>
-                    </a>
-                </li>
+                <?php if ($role === 'admin') : ?>
+                    <li class="nav-item rounded <?= $this->renderSection('manage-user-active') ?>">
+                        <a href="<?= base_url('/admin/manage-users'); ?>" class="nav-link text-white">
+                            <i class="bi bi-people"></i>
+                            <span x-show="open">Manage Users</span>
+                        </a>
+                    </li>
 
-                <li class="nav-item rounded <?= $this->renderSection('export-records-active') ?>">
-                    <a href="<?= base_url('/admin/export-records'); ?>" class="nav-link text-white">
-                        <i class="bi bi-file-earmark-excel"></i>
-                        <span x-show="open">Export Records</span>
-                    </a>
-                </li>
+                    <li class="nav-item rounded <?= $this->renderSection('export-records-active') ?>">
+                        <a href="<?= base_url('/admin/export-records'); ?>" class="nav-link text-white">
+                            <i class="bi bi-file-earmark-excel"></i>
+                            <span x-show="open">Export Records</span>
+                        </a>
+                    </li>
+                <?php endif ?>
 
             </ul>
         </div>
@@ -150,9 +155,7 @@
 
         <!-- Top Navbar -->
         <?php
-
         $currentUrl = current_url();
-
         if (!str_contains($currentUrl, '/admin/export-records')):
         ?>
             <nav class="navbar navbar-white bg-white rounded shadow-sm mb-2 p-4">
