@@ -102,7 +102,10 @@
 
         // Minimal fetch with CSRF
         async function csrfFetch(url, formData) {
-            const {token, name} = getCSRF();
+            const {
+                token,
+                name
+            } = getCSRF();
 
             formData.append(name, token);
 

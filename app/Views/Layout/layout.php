@@ -73,13 +73,17 @@
         .content.normal {
             margin-left: 250px;
         }
+
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
 <?php
 $role = session()->get('userRole');
 ?>
 
-<body x-data="{ open: true }" class="bg-light">
+<body x-data="{ open: true }" class="bg-light" x-cloak>
 
     <!-- Sidebar -->
     <div :class="open ? 'sidebar bg-dark text-white position-fixed d-flex flex-column' 
