@@ -15,37 +15,42 @@ class ManageRecordPageController extends BaseController
 
     public function fetchRecords()
     {
-        try {
-            if (!session()->get('userId')) {
-                return $this->response->setJSON([
-                    'status' => 'error',
-                    'message' => 'Unauthorized access.'
-                ])->setStatusCode(403);
-            }
+        $model = new PersonsModel();
 
-            $search = $this->request->getGet('search');
-            $model = new PersonsModel();
+        $search = $this->request->getGet('search');
+        $page = max(1, (int) ($this->request->getGet('page') ?? 1));
 
-            if ($search != '') {
-                $model->groupStart()
-                    ->like('lastname', $search)
-                    ->orLike('firstname', $search)
-                    ->orLike('pwd_no', $search)
-                    ->groupEnd();
-            }
+        $limit = 15;
+        $offset = ($page - 1) * $limit;
 
-            $records = $model->findAll();
-
-            return $this->response->setJSON([
-                'status' => 'success',
-                'data' => $records
-            ]);
-        } catch (\Throwable $e) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'errors' => $e->getMessage()
-            ]);
+        // Apply search filters if provided
+        if (!empty($search)) {
+            $model = $model->groupStart()
+                ->like('pwd_no', $search)
+                ->orLike('lastname', $search)
+                ->orLike('firstname', $search)
+                ->groupEnd();
         }
+
+        // Get total records (clone the query builder)
+        $totalRecords = $model->countAllResults(false);
+
+        // Fetch paginated data (reuse the same builder but reset count)
+        $records = $model->findAll($limit, $offset);
+
+        // Calculate total pages
+        $totalPages = $totalRecords > 0 ? ceil($totalRecords / $limit) : 1;
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data' => $records,
+            'pagination' => [
+                'current_page' => $page,
+                'per_page' => $limit,
+                'total_records' => (int) $totalRecords,
+                'total_pages' => (int) $totalPages
+            ]
+        ]);
     }
 
 

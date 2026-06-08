@@ -19,9 +19,35 @@ class AdminPageController extends BaseController
 
         $model = new PersonsModel();
         $presentMonth = date('m');
-        $persons = $model->select('id, pwd_no, lastname, firstname, middlename, suffix, birthdate, age, sex, barangay, street_name, created_at')->where('MONTH(created_at)', $presentMonth)->findAll();
 
-        return view('admin/admin-dashboard', ['persons' => $persons]);
+        // Pagination configuration
+        $page = (int) ($this->request->getGet('page') ?? 1);
+        $perPage = 20; // Records per page
+        $offset = ($page - 1) * $perPage;
+
+        // Get total records count for the current month
+        $totalRecords = $model->select('id')
+            ->where('MONTH(created_at)', $presentMonth)
+            ->countAllResults(false);
+
+        // Get paginated records
+        $persons = $model->select('id, pwd_no, lastname, firstname, middlename, suffix, birthdate, age, sex, barangay, street_name, created_at')
+            ->where('MONTH(created_at)', $presentMonth)
+            ->orderBy('created_at', 'DESC')
+            ->findAll($perPage, $offset);
+
+        // Calculate total pages
+        $totalPages = ceil($totalRecords / $perPage);
+
+        return view('admin/admin-dashboard', [
+            'persons' => $persons,
+            'pagination' => [
+                'current_page' => $page,
+                'per_page' => $perPage,
+                'total_records' => $totalRecords,
+                'total_pages' => $totalPages
+            ]
+        ]);
     }
 
 

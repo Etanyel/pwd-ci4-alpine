@@ -272,4 +272,68 @@ class ShowUserPageController extends BaseController
             'message' => 'User information updated successfully.'
         ]);
     }
+
+    public function addUser()
+    {
+        try {
+            $model = new UserModel();
+
+            $firstname = $this->request->getPost('firstname');
+            $lastname = $this->request->getPost('lastname');
+            $middlename = $this->request->getPost('middlename');
+            $suffix = $this->request->getPost('suffix');
+            $age = $this->request->getPost('age');
+            $sex = $this->request->getPost('sex');
+            $role = $this->request->getPost('role');
+            $avatar = $this->request->getPost('avatar');
+            $username = $this->request->getPost('username');
+            $password = $this->request->getPost('password');
+
+            $validation = Services::validation();
+
+            $validation->setRules([
+                'firstname' => [
+                    'label' => 'FIRSTNAME',
+                    'rules' => 'required|max_length[50]|min_length[2]'
+                ],
+                'lastname' => [
+                    'label' => 'LASTNAME',
+                    'rules' => 'required|max_length[50]|min_length[2]'
+                ],
+                'middlename' => [
+                    'label' => 'MIDDLENAME',
+                    'rules' => 'max_length[20]'
+                ],
+                'suffix' => [
+                    'label' => 'SUFFIX',
+                    'rules' => 'max_length[5]'
+                ],
+                'age' => [
+                    'label' => 'AGE',
+                    'rules' => 'required|numeric'
+                ],
+                'sex' => [
+                    'label' => 'AGE',
+                    'rules' => 'required|in_list[male,female]'
+                ],
+                'role' => [
+                    'label' => 'ROLE',
+                    'rules' => 'required|in_list[user,admin]'
+                ],
+                'username' => [
+                    'label' => 'USERNAME',
+                    'rules' => 'required|max_length[20]|min_length[4]'
+                ],
+                'password' => [
+                    'label' => 'PASSWORD',
+                    'rules' => 'required|max_length[50]|min_length[6]'
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $e->getMessage()
+            ]);
+        }
+    }
 }

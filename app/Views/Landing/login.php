@@ -79,7 +79,9 @@
                         </span>
                     </button>
                 </div>
+
             </form>
+            <span class="text-center text-muted mt-2">© <?= date('Y') ?> Office of the Senior Citizens Affairs</span>
         </div>
     </div>
 

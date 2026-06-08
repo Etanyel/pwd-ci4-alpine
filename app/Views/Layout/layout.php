@@ -179,7 +179,7 @@ $role = session()->get('userRole');
     <script src="<?= base_url('css/bootstrap/dist/js/bootstrap.bundle.min.js') ?>"></script>
 
     <script>
-        // Simple CSRF helpers
+        // CSRF helpers
         function getCSRF() {
             return {
                 token: document.querySelector('meta[name="csrf-token"]').content,

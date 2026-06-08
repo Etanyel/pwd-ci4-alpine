@@ -62,7 +62,7 @@
                 <div class="row">
                     <div class="col-4">
                         <label class="form-label fw-semibold">4. TYPE OF DISABILITY <span :class="form.typeDisability == '' ? 'text-danger' : 'd-none'">*</span></label>
-                        <select class="form-select" x-model="form.typeDisability" :class="errors.type_of_disability ? 'border-danger' : ''">
+                        <select class="form-select" x-model="form.typeDisability" :class="errors.type_of_disability ? 'border-danger' : ''" required>
                             <template x-for="item in disability" :key="item.id">
                                 <option :value="item.disability_id"><span x-text="item.disability"></span></option>
                             </template>
@@ -75,7 +75,7 @@
                         <select class="form-select"
                             x-model="form.causeOfDisability"
                             @change="causeOf()" required
-                            :class="errors.cause_of_disability ? 'border-danger' : ''">
+                            :class="errors.cause_of_disability ? 'border-danger' : ''" required>
                             <option value="">Select Type</option>
                             <option value="0">Congenital/Inborn</option>
                             <option value="1">Acquired</option>
@@ -113,7 +113,7 @@
                     <!-- REGION -->
                     <div class="col-3">
                         <label class="form-label fw-semibold">REGION <span :class="form.region == '' ? 'text-danger' : 'd-none'">*</span></label>
-                        <select class="form-select" x-model="form.region" @change="fetchProvinces" :class="errors.region ? 'border-danger' : ''">
+                        <select class="form-select" x-model="form.region" @change="fetchProvinces" :class="errors.region ? 'border-danger' : ''" required>
                             <option value="">Select Region</option>
                             <template x-for="r in regions" :key="r.code">
                                 <option :value="r.code" x-text="r.region_name"></option>
@@ -400,8 +400,8 @@
                 </div>
             </div>
 
-            <div class="mt-5">
-                <button class="btn btn-dark" type="submit">Submit Form</button>
+            <div class="mt-5" @dblclick="!validated">
+                <button class="btn btn-dark" type="submit" :disabled="!validated">Submit Form</button>
             </div>
         </form>
     </div>
@@ -425,6 +425,7 @@
             cities: [],
             barangays: [],
             occupation: [],
+            errorsInBtn: [],
 
             form: {
                 pwd_no: '',
@@ -467,6 +468,57 @@
                 mothers_lastname: '',
                 mothers_firstname: '',
                 mothers_middlename: '',
+            },
+
+            get validated() {
+                let validatedForm = true;
+
+                if (this.form.pwd_no.length == 0) {
+                    this.errorsInBtn.pwd_no = 'PWD NO. is required.';
+                    return validatedForm = false;
+                }
+                if (this.form.date_applied.length == 0) {
+                    this.errorsInBtn.date_applied = 'DATE APPLIED is required.';
+                    return validatedForm = false;
+                }
+                if (this.form.lastname.length == 0) {
+                    this.errorsInBtn.lastname = 'LASTNAME is required.';
+                    return validatedForm = false;
+                }
+                if (this.form.firstname.length == 0) {
+                    this.errorsInBtn.firstname = 'FIRSTNAME is required.';
+                    return validatedForm = false;
+                }
+                if (this.form.typeDisability.length == 0) {
+                    this.errorsInBtn.type_of_disability = 'TYPE OF DISABILITY is required.';
+                    return validatedForm = false;
+                }
+                if (this.form.causeOfDisability.length == 0) {
+                    this.errorsInBtn.cause_of_disability = 'CAUSE OF DISABILITY is required.';
+                    return validatedForm = false;
+                }
+                if (this.form.region.length == 0) {
+                    this.errorsInBtn.region = 'REGION is required.';
+                    return validatedForm = false;
+                }
+                if (this.form.province.length == 0) {
+                    this.errorsInBtn.province = 'PROVINCE is required.';
+                    return validatedForm = false;
+                }
+                if (this.form.city.length == 0) {
+                    this.errorsInBtn.city_municipality = 'CITY is required.';
+                    return validatedForm = false;
+                }
+                if (this.form.barangay.length == 0) {
+                    this.errorsInBtn.barangay = 'BARANGAY is required.';
+                    return validatedForm = false;
+                }
+                if (this.form.street_name.length == 0) {
+                    this.errorsInBtn.street_name = 'STREET NAME/PUROK is required.';
+                    return validatedForm = false;
+                }
+
+                return validatedForm;
             },
 
             init() {

@@ -48,7 +48,7 @@
     <div class="container-fluid card shadow-sm p-3 bg-white bg-gradient border-0 mt-4" x-show="!showForm">
         <div class="table-responsive">
             <table class="table table-hover">
-                <thead>
+                <thead class="table-dark">
                     <tr>
                         <th>ID</th>
                         <th>Full Name</th>
@@ -219,7 +219,6 @@
 
                             <!-- ROLE & AVATAR -->
                             <div class="row g-3 mb-2">
-
                                 <div class="col-12 col-md-6">
                                     <label class="form-label mb-1 text-muted fw-semibold small">
                                         ROLE
@@ -245,16 +244,7 @@
                                     <label class="form-label mb-1 text-muted fw-semibold small">
                                         UPLOAD AVATAR
                                     </label>
-
-                                    <input type="file"
-                                        class="form-control"
-                                        @change="avatar = $event.target.files[0]"
-                                        :class="showErrors && !avatar ? 'border-danger' : ''">
-
-                                    <small class="text-danger"
-                                        x-show="showErrors && !avatar">
-                                        Please upload an avatar.
-                                    </small>
+                                    <input type="file" class="form-control">
                                 </div>
                             </div>
 
@@ -287,13 +277,13 @@
                                 <input type="password"
                                     class="form-control"
                                     x-model="password"
-                                    :class="showErrors && password.length < 8 ? 'border-danger' : ''"
+                                    :class="showErrors && password.length < 6 ? 'border-danger' : ''"
                                     maxlength="20"
                                     placeholder="ex. password123#"
                                     required>
 
                                 <small class="text-danger"
-                                    x-show="showErrors && password.length < 8">
+                                    x-show="showErrors && password.length < 6">
                                     Password must contain at least 8 characters.
                                 </small>
                             </div>
@@ -337,7 +327,6 @@
                 age: '',
                 sex: '',
                 role: '',
-                avatar: null,
                 username: '',
                 password: '',
 
@@ -353,8 +342,7 @@
                         this.age >= 1 &&
                         this.role !== '' &&
                         this.password.length >= 8 &&
-                        this.username.length >= 4 &&
-                        this.avatar != null
+                        this.username.length >= 4
                     );
                 },
 
